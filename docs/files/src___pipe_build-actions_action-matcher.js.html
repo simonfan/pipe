@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>pipe</title>
+    <title>src/__pipe/build-actions/action-matcher.js - pipe</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
-    <link rel="stylesheet" href="./assets/vendor/prettify/prettify-min.css">
-    <link rel="stylesheet" href="./assets/css/main.css" id="site_styles">
-    <link rel="shortcut icon" type="image/png" href="./assets/favicon.png">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
     <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
 </head>
 <body class="yui3-skin-sam">
@@ -15,7 +15,7 @@
     <div id="hd" class="yui3-g header">
         <div class="yui3-u-3-4">
             
-                <h1><img src="./assets/css/logo.png" title="pipe"></h1>
+                <h1><img src="../assets/css/logo.png" title="pipe"></h1>
             
         </div>
         <div class="yui3-u-1-4 version">
@@ -45,7 +45,7 @@
 
             <ul id="api-modules" class="apis modules">
             
-                <li><a href="./modules/pipe.html">pipe</a></li>
+                <li><a href="../modules/pipe.html">pipe</a></li>
             
             </ul>
         </div>
@@ -82,27 +82,50 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                            <div class="apidocs">
-        <div id="docs-main" class="content">
-            <p>
-            Browse to a module or class using the sidebar to view its API documentation.
-            </p>
+                        <h1 class="file-heading">File: src/__pipe/build-actions/action-matcher.js</h1>
 
-            <h2>Keyboard Shortcuts</h2>
+<div class="file">
+    <pre class="code prettyprint linenums">
+/* jshint ignore:start */
+if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefine&#x27;)(module) }
+/* jshint ignore:end */
 
-            <ul>
-                <li><p>Press <kbd>s</kbd> to focus the API search box.</p></li>
+define(function (require, exports, module) {
+	&#x27;use strict&#x27;;
 
-                <li><p>Use <kbd>Up</kbd> and <kbd>Down</kbd> to select classes, modules, and search results.</p></li>
+	var wildcardMatcher = /\*/g;
 
-                <li class="mac-only"><p>With the API search box or sidebar focused, use <kbd><span class="cmd">&#x2318;</span>-Left</kbd> or <kbd><span class="cmd">&#x2318;</span>-Right</kbd> to switch sidebar tabs.</p></li>
+	/**
+	 * Checks whether the name accepts wildcards.
+	 * If so, returns a regexp.
+	 * Otherwise, return a string, for exact matching.
+	 *
+	 * @param  {[type]} actionName [description]
+	 * @return {[type]}            [description]
+	 */
+	module.exports = function actionMatcher(actionName) {
 
-                <li class="pc-only"><p>With the API search box or sidebar focused, use <kbd>Ctrl+Left</kbd> and <kbd>Ctrl+Right</kbd> to switch sidebar tabs.</p></li>
-            </ul>
-        </div>
-    </div>
+		var matcher;
+
+		if (actionName.match(wildcardMatcher)) {
+			// wildcard
+
+			matcher = actionName.replace(wildcardMatcher, &#x27;.*&#x27;);
+			matcher = new RegExp(matcher);
+
+		} else {
+			// not wildcard
+			matcher = actionName;
+		}
+
+		return matcher;
+	};
 
 
+});
+
+    </pre>
+</div>
 
                     </div>
                 </div>
@@ -110,13 +133,13 @@
         </div>
     </div>
 </div>
-<script src="./assets/vendor/prettify/prettify-min.js"></script>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
 <script>prettyPrint();</script>
-<script src="./assets/js/yui-prettify.js"></script>
-<script src="./assets/../api.js"></script>
-<script src="./assets/js/api-filter.js"></script>
-<script src="./assets/js/api-list.js"></script>
-<script src="./assets/js/api-search.js"></script>
-<script src="./assets/js/apidocs.js"></script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
 </body>
 </html>

@@ -13,7 +13,8 @@ require.config({
 		'requirejs-text': '../bower_components/requirejs-text/text',
 		subject: '../bower_components/subject/built/subject',
 		underscore: '../bower_components/underscore/underscore',
-		q: '../bower_components/q/q'
+		q: '../bower_components/q/q',
+		'__pipe/build-actions/action-matcher': '__pipe/build-actions/action-matcher'
 	},
 	shim: {
 		backbone: {

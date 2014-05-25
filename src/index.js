@@ -15,20 +15,20 @@ if (typeof define !== 'function') { var define = require('amdefine')(module) }
 define(function (require, exports, module) {
 	'use strict';
 
+	var subject = require('subject');
 
-	var subject = require('subject'),
-		_       = require('lodash');
-
-	var build   = require('./__pipe/build-actions');
-
+	var buildActions = require('./__pipe/build-actions/index');
 
 	var pipe = module.exports = subject({
 		initialize: function initialize(source, destination, actions) {
 
-
 			this.source      = source;
+			this.cache       = {};
+
 			this.destination = destination;
-			this.actions     = build.call(this, actions);
+			this.actions     = buildActions.call(this, actions);
 		},
 	});
+
+	pipe.assignProto(require('./__pipe/stream-control'))
 });

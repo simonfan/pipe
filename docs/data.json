@@ -4,10 +4,31 @@
         "version": "0.0.0"
     },
     "files": {
+        "src/__pipe/build-actions/action-matcher.js": {
+            "name": "src/__pipe/build-actions/action-matcher.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/__pipe/build-actions/index.js": {
+            "name": "src/__pipe/build-actions/index.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/__pipe/stream-control.js": {
+            "name": "src/__pipe/stream-control.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "src/index.js": {
             "name": "src/index.js",
             "modules": {
-                "Pipe": 1
+                "pipe": 1
             },
             "classes": {},
             "fors": {},
@@ -15,8 +36,8 @@
         }
     },
     "modules": {
-        "Pipe": {
-            "name": "Pipe",
+        "pipe": {
+            "name": "pipe",
             "submodules": {},
             "classes": {},
             "fors": {},
@@ -28,6 +49,183 @@
         }
     },
     "classes": {},
-    "classitems": [],
-    "warnings": []
+    "classitems": [
+        {
+            "file": "src/__pipe/build-actions/action-matcher.js",
+            "line": 10,
+            "description": "Checks whether the name accepts wildcards.\nIf so, returns a regexp.\nOtherwise, return a string, for exact matching.",
+            "params": [
+                {
+                    "name": "actionName",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/build-actions/index.js",
+            "line": 18,
+            "description": "Invokes a list of functions.",
+            "params": [
+                {
+                    "name": "fns",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/build-actions/index.js",
+            "line": 35,
+            "description": "Converts an array of action definitions and returns a function.",
+            "params": [
+                {
+                    "name": "subActions",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "actionName",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/build-actions/index.js",
+            "line": 68,
+            "params": [
+                {
+                    "name": "action",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "actionName",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/build-actions/index.js",
+            "line": 91,
+            "description": "Given an action of any format,\nreturns a function to be executed.",
+            "params": [
+                {
+                    "name": "action",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "actionName",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/build-actions/index.js",
+            "line": 113,
+            "description": "Takes a hash of actions and returns an array of action objects.",
+            "params": [
+                {
+                    "name": "actions",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/stream-control.js",
+            "line": 12,
+            "description": "Runs a single action\ntesting its matcher across all properties of the source object.\n\n[execAction description]",
+            "params": [
+                {
+                    "name": "action",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/stream-control.js",
+            "line": 55,
+            "description": "[exports description]",
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nChecks whether the name accepts wildcards.\nIf so, returns a regexp.\nOtherwise, return a string, for exact matching.",
+            "line": " src/__pipe/build-actions/action-matcher.js:10"
+        },
+        {
+            "message": "Missing item type\nInvokes a list of functions.",
+            "line": " src/__pipe/build-actions/index.js:18"
+        },
+        {
+            "message": "Missing item type\nConverts an array of action definitions and returns a function.",
+            "line": " src/__pipe/build-actions/index.js:35"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/__pipe/build-actions/index.js:68"
+        },
+        {
+            "message": "Missing item type\nGiven an action of any format,\nreturns a function to be executed.",
+            "line": " src/__pipe/build-actions/index.js:91"
+        },
+        {
+            "message": "Missing item type\nTakes a hash of actions and returns an array of action objects.",
+            "line": " src/__pipe/build-actions/index.js:113"
+        },
+        {
+            "message": "Missing item type\nRuns a single action\ntesting its matcher across all properties of the source object.\n\n[execAction description]",
+            "line": " src/__pipe/stream-control.js:12"
+        },
+        {
+            "message": "Missing item type\n[exports description]",
+            "line": " src/__pipe/stream-control.js:55"
+        }
+    ]
 }

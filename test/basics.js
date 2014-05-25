@@ -36,6 +36,14 @@
 			destination.m4 = _.partial(set, destination, 'k4');
 
 
+			destination.notifications = {};
+			destination.notify = function notify(value, sourceKey) {
+				this.notifications[sourceKey] = this.notifications[sourceKey] ?
+					this.notifications[sourceKey].concat(value) :
+					[value];
+			};
+
+
 			// create a source object
 			var source = {};
 
@@ -51,7 +59,7 @@
 				sourceK1: 'm1',
 				sourceK2: 'm2',
 
-				'source*': { regexp: true }
+				'source*': 'notify'
 			});
 
 			// set some data on source
@@ -59,12 +67,26 @@
 			source.sourceK2 = 'value-2';
 
 			// execute
-			pipe.inject();
+			dataPipe.inject();
 
 			// check that destination methods were run.
 			destination.k1.should.eql('value-1');
 			destination.k2.should.eql('value-2');
 
+			destination.notifications.sourceK1.should.eql(['value-1']);
+			destination.notifications.sourceK2.should.eql(['value-2']);
+
+			// change data and inject again
+			source.sourceK1 = 'value-1-2';
+			source.sourceK2 = 'value-2-2';
+			dataPipe.inject();
+
+			destination.k1.should.eql('value-1-2');
+			destination.k2.should.eql('value-2-2');
+			destination.notifications.should.eql({
+				sourceK1: ['value-1', 'value-1-2'],
+				sourceK2: ['value-2', 'value-2-2']
+			});
 		});
 	});
 });
