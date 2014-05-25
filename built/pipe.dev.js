@@ -66,13 +66,14 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 
 	/**
 	 * Runs a single pipe function with a single key.
+	 * Passes only one argument, the value.
 	 *
 	 * @param  {[type]}   source [description]
 	 * @param  {Function} fn     [description]
 	 * @param  {[type]}   key    [description]
 	 * @return {[type]}          [description]
 	 */
-	function execSinglePipe(source, fn, key) {
+	function execExactKeyPipe(source, fn, key) {
 		// get value
 		var value = source[key];
 
@@ -80,7 +81,32 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 		// ONLY WHEN ALL PIPES HAVE BEEN RUN.
 		__closure.cacheTmp[key] = value;
 
-		return fn(value, key);
+		return fn(value);
+	}
+
+
+	/**
+	 * Runs a single pipe function
+	 * For a wildcard key.
+	 *
+	 * The difference is the this runner passes the
+	 * key as first argument.
+	 *
+	 * [execWildcardKeyPipe description]
+	 * @param  {[type]}   source [description]
+	 * @param  {Function} fn     [description]
+	 * @param  {[type]}   key    [description]
+	 * @return {[type]}          [description]
+	 */
+	function execWildcardKeyPipe(source, fn, key) {
+		// get value
+		var value = source[key];
+
+		// set value to cache
+		// ONLY WHEN ALL PIPES HAVE BEEN RUN.
+		__closure.cacheTmp[key] = value;
+
+		return fn(key, value);
 	}
 
 	/**
@@ -101,7 +127,7 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 		if (_.isString(matcher) && this.changed(matcher)) {
 			// exact key
 
-			res.push(execSinglePipe(source, fn, matcher));
+			res.push(execExactKeyPipe(source, fn, matcher));
 
 		} else if (_.isRegExp(matcher)) {
 			// wildcard key
@@ -112,7 +138,7 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 
 				// exec pipe for keys that match the matcher
 				if (matcher.test(key) && this.changed(key)) {
-					res.push(execSinglePipe(source, fn, key))
+					res.push(execWildcardKeyPipe(source, fn, key))
 				}
 
 			}
@@ -120,6 +146,10 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 
 		return res.length === 1 ? res[0] : q.all(res);
 	}
+
+
+
+
 
 	/**
 	 * [exports description]
@@ -276,25 +306,56 @@ define('__pipe/line/fn',['require','exports','module','lodash','q'],function (re
 		}, this);
 	}
 
+
+
+	/**
+	 * [0] full matched str
+	 * [1] method
+	 * [2] arguments
+	 *
+	 * [stringLineFnParse description]
+	 * @param  {[type]} str [description]
+	 * @return {[type]}     [description]
+	 */
+	var lineMatcher = /^\s*([^:]*)(?::(.*))?$/,
+		argsSplit   = /\s*,\s*/g;
+
+	function stringLineFnParse(str) {
+
+		var match = str.match(lineMatcher);
+
+		if (!match) {
+			throw new Error('Invalid line definition for jquery-pipe.');
+		}
+
+		return {
+			method: match[1],
+			args  : match[2] ? match[2].split(argsSplit) : []
+		};
+	}
+
+
 	/**
 	 *
-	 * @param  {[type]} methodName     [description]
+	 * @param  {[type]} stringLineStr     [description]
 	 * @param  {[type]} lineName [description]
 	 * @return {[type]}            [description]
 	 */
-	function stringLineFn(methodName, lineName) {
+	function stringLineFn(stringLineStr, lineName) {
+
+		var parsed = stringLineFnParse(stringLineStr);
 
 		// [1] check if there is a method on the destination
 		//     corresponding to the line defined
 		return _.bind(function pipeInvokeMethodsOnDestinations() {
 
 			// get invocation arguments
-			var args = _.toArray(arguments);
+			var args = parsed.args.concat(_.toArray(arguments));
 
 			// invoke methods on destinations.
 			var results = _.map(this.destinations, function (destination) {
 				// invoke method on the destination
-				return destination[methodName].apply(destination, args);
+				return destination[parsed.method].apply(destination, args);
 			});
 
 			// return promise, as always.

@@ -19,7 +19,7 @@
 })('test', function(pipe, should, _) {
 	'use strict';
 
-	describe('pipe basics', function () {
+	describe('pipe demo', function () {
 
 		it('demo', function () {
 
@@ -37,7 +37,7 @@
 
 
 			destination.notifications = {};
-			destination.notify = function notify(value, sourceKey) {
+			destination.notify = function notify(sourceKey, value) {
 				this.notifications[sourceKey] = this.notifications[sourceKey] ?
 					this.notifications[sourceKey].concat(value) :
 					[value];

@@ -74,25 +74,56 @@ define(function (require, exports, module) {
 		}, this);
 	}
 
+
+
+	/**
+	 * [0] full matched str
+	 * [1] method
+	 * [2] arguments
+	 *
+	 * [stringLineFnParse description]
+	 * @param  {[type]} str [description]
+	 * @return {[type]}     [description]
+	 */
+	var lineMatcher = /^\s*([^:]*)(?::(.*))?$/,
+		argsSplit   = /\s*,\s*/g;
+
+	function stringLineFnParse(str) {
+
+		var match = str.match(lineMatcher);
+
+		if (!match) {
+			throw new Error('Invalid line definition for jquery-pipe.');
+		}
+
+		return {
+			method: match[1],
+			args  : match[2] ? match[2].split(argsSplit) : []
+		};
+	}
+
+
 	/**
 	 *
-	 * @param  {[type]} methodName     [description]
+	 * @param  {[type]} stringLineStr     [description]
 	 * @param  {[type]} lineName [description]
 	 * @return {[type]}            [description]
 	 */
-	function stringLineFn(methodName, lineName) {
+	function stringLineFn(stringLineStr, lineName) {
+
+		var parsed = stringLineFnParse(stringLineStr);
 
 		// [1] check if there is a method on the destination
 		//     corresponding to the line defined
 		return _.bind(function pipeInvokeMethodsOnDestinations() {
 
 			// get invocation arguments
-			var args = _.toArray(arguments);
+			var args = parsed.args.concat(_.toArray(arguments));
 
 			// invoke methods on destinations.
 			var results = _.map(this.destinations, function (destination) {
 				// invoke method on the destination
-				return destination[methodName].apply(destination, args);
+				return destination[parsed.method].apply(destination, args);
 			});
 
 			// return promise, as always.

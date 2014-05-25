@@ -127,10 +127,27 @@
         },
         {
             "file": "src/__pipe/line/fn.js",
-            "line": 77,
+            "line": 79,
+            "description": "[0] full matched str\n[1] method\n[2] arguments\n\n[stringLineFnParse description]",
             "params": [
                 {
-                    "name": "methodName",
+                    "name": "str",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/line/fn.js",
+            "line": 106,
+            "params": [
+                {
+                    "name": "stringLineStr",
                     "description": "[description]",
                     "type": "[type]"
                 },
@@ -148,7 +165,7 @@
         },
         {
             "file": "src/__pipe/line/fn.js",
-            "line": 106,
+            "line": 137,
             "description": "Given an line of any format,\nreturns a function to be executed.",
             "params": [
                 {
@@ -268,7 +285,7 @@
         {
             "file": "src/__pipe/stream-control.js",
             "line": 23,
-            "description": "Runs a single pipe function with a single key.",
+            "description": "Runs a single pipe function with a single key.\nPasses only one argument, the value.",
             "params": [
                 {
                     "name": "source",
@@ -294,7 +311,34 @@
         },
         {
             "file": "src/__pipe/stream-control.js",
-            "line": 42,
+            "line": 44,
+            "description": "Runs a single pipe function\nFor a wildcard key.\n\nThe difference is the this runner passes the\nkey as first argument.\n\n[execWildcardKeyPipe description]",
+            "params": [
+                {
+                    "name": "source",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "fn",
+                    "description": "[description]",
+                    "type": "Function"
+                },
+                {
+                    "name": "key",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/stream-control.js",
+            "line": 68,
             "description": "Runs a single line\ntesting its matcher across all properties of the source object.\n\n[execPipeLine description]",
             "params": [
                 {
@@ -311,7 +355,7 @@
         },
         {
             "file": "src/__pipe/stream-control.js",
-            "line": 80,
+            "line": 110,
             "description": "[exports description]",
             "return": {
                 "description": "[description]",
@@ -321,7 +365,7 @@
         },
         {
             "file": "src/__pipe/stream-control.js",
-            "line": 107,
+            "line": 137,
             "description": "Sets data onto source AND pushes.",
             "params": [
                 {
@@ -392,12 +436,16 @@
             "line": " src/__pipe/line/fn.js:50"
         },
         {
+            "message": "Missing item type\n[0] full matched str\n[1] method\n[2] arguments\n\n[stringLineFnParse description]",
+            "line": " src/__pipe/line/fn.js:79"
+        },
+        {
             "message": "Missing item type",
-            "line": " src/__pipe/line/fn.js:77"
+            "line": " src/__pipe/line/fn.js:106"
         },
         {
             "message": "Missing item type\nGiven an line of any format,\nreturns a function to be executed.",
-            "line": " src/__pipe/line/fn.js:106"
+            "line": " src/__pipe/line/fn.js:137"
         },
         {
             "message": "Missing item type\n[line description]",
@@ -424,20 +472,24 @@
             "line": " src/__pipe/stream-control.js:13"
         },
         {
-            "message": "Missing item type\nRuns a single pipe function with a single key.",
+            "message": "Missing item type\nRuns a single pipe function with a single key.\nPasses only one argument, the value.",
             "line": " src/__pipe/stream-control.js:23"
         },
         {
+            "message": "Missing item type\nRuns a single pipe function\nFor a wildcard key.\n\nThe difference is the this runner passes the\nkey as first argument.\n\n[execWildcardKeyPipe description]",
+            "line": " src/__pipe/stream-control.js:44"
+        },
+        {
             "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the source object.\n\n[execPipeLine description]",
-            "line": " src/__pipe/stream-control.js:42"
+            "line": " src/__pipe/stream-control.js:68"
         },
         {
             "message": "Missing item type\n[exports description]",
-            "line": " src/__pipe/stream-control.js:80"
+            "line": " src/__pipe/stream-control.js:110"
         },
         {
             "message": "Missing item type\nSets data onto source AND pushes.",
-            "line": " src/__pipe/stream-control.js:107"
+            "line": " src/__pipe/stream-control.js:137"
         },
         {
             "message": "Missing item type\n[initialize description]",

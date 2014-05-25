@@ -22,13 +22,14 @@ define(function (require, exports, module) {
 
 	/**
 	 * Runs a single pipe function with a single key.
+	 * Passes only one argument, the value.
 	 *
 	 * @param  {[type]}   source [description]
 	 * @param  {Function} fn     [description]
 	 * @param  {[type]}   key    [description]
 	 * @return {[type]}          [description]
 	 */
-	function execSinglePipe(source, fn, key) {
+	function execExactKeyPipe(source, fn, key) {
 		// get value
 		var value = source[key];
 
@@ -36,7 +37,32 @@ define(function (require, exports, module) {
 		// ONLY WHEN ALL PIPES HAVE BEEN RUN.
 		__closure.cacheTmp[key] = value;
 
-		return fn(value, key);
+		return fn(value);
+	}
+
+
+	/**
+	 * Runs a single pipe function
+	 * For a wildcard key.
+	 *
+	 * The difference is the this runner passes the
+	 * key as first argument.
+	 *
+	 * [execWildcardKeyPipe description]
+	 * @param  {[type]}   source [description]
+	 * @param  {Function} fn     [description]
+	 * @param  {[type]}   key    [description]
+	 * @return {[type]}          [description]
+	 */
+	function execWildcardKeyPipe(source, fn, key) {
+		// get value
+		var value = source[key];
+
+		// set value to cache
+		// ONLY WHEN ALL PIPES HAVE BEEN RUN.
+		__closure.cacheTmp[key] = value;
+
+		return fn(key, value);
 	}
 
 	/**
@@ -57,7 +83,7 @@ define(function (require, exports, module) {
 		if (_.isString(matcher) && this.changed(matcher)) {
 			// exact key
 
-			res.push(execSinglePipe(source, fn, matcher));
+			res.push(execExactKeyPipe(source, fn, matcher));
 
 		} else if (_.isRegExp(matcher)) {
 			// wildcard key
@@ -68,7 +94,7 @@ define(function (require, exports, module) {
 
 				// exec pipe for keys that match the matcher
 				if (matcher.test(key) && this.changed(key)) {
-					res.push(execSinglePipe(source, fn, key))
+					res.push(execWildcardKeyPipe(source, fn, key))
 				}
 
 			}
@@ -76,6 +102,10 @@ define(function (require, exports, module) {
 
 		return res.length === 1 ? res[0] : q.all(res);
 	}
+
+
+
+
 
 	/**
 	 * [exports description]
