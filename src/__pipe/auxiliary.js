@@ -12,22 +12,22 @@ define(function (require, exports, module) {
 	 * If so, returns a regexp.
 	 * Otherwise, return a string, for exact matching.
 	 *
-	 * @param  {[type]} actionName [description]
+	 * @param  {[type]} str [description]
 	 * @return {[type]}            [description]
 	 */
-	module.exports = function actionMatcher(actionName) {
+	exports.wildcard = function wildcard(str) {
 
 		var matcher;
 
-		if (actionName.match(wildcardMatcher)) {
+		if (str.match(wildcardMatcher)) {
 			// wildcard
 
-			matcher = actionName.replace(wildcardMatcher, '.*');
+			matcher = str.replace(wildcardMatcher, '.*');
 			matcher = new RegExp(matcher);
 
 		} else {
 			// not wildcard
-			matcher = actionName;
+			matcher = str;
 		}
 
 		return matcher;

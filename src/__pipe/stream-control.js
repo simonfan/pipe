@@ -9,43 +9,68 @@ define(function (require, exports, module) {
 	var _ = require('lodash'),
 		q = require('q');
 
+
 	/**
-	 * Runs a single action
+	 * Used for communication between methods defined in this module.
+	 * Essentially for caching.
+	 *
+	 * @type {Object}
+	 */
+	var __closure = {
+		cacheTmp: {}
+	};
+
+	/**
+	 * Runs a single pipe function with a single key.
+	 *
+	 * @param  {[type]}   source [description]
+	 * @param  {Function} fn     [description]
+	 * @param  {[type]}   key    [description]
+	 * @return {[type]}          [description]
+	 */
+	function execSinglePipe(source, fn, key) {
+		// get value
+		var value = source[key];
+
+		// set value to cache
+		// ONLY WHEN ALL PIPES HAVE BEEN RUN.
+		__closure.cacheTmp[key] = value;
+
+		return fn(value, key);
+	}
+
+	/**
+	 * Runs a single line
 	 * testing its matcher across all properties of the source object.
 	 *
-	 * [execAction description]
-	 * @param  {[type]} action [description]
-	 * @return {[type]}        [description]
+	 * [execPipeLine description]
+	 * @param  {[type]} def [description]
+	 * @return {Promise}     [description]
 	 */
-	function execAction(action) {
+	function execPipeLine(def, name) {
 
 		var source  = this.source,
-			matcher = action.matcher,
-			fn      = action.fn,
+			matcher = def.matcher,
+			fn      = def.fn,
 			res     = [];
 
-		if (_.isString(matcher)) {
+		if (_.isString(matcher) && this.changed(matcher)) {
 			// exact key
 
-			var value = source[matcher];
-			// execute the action fn passing
-			// the source[matcher] as argument
-			res.push(fn(value, matcher));
+			res.push(execSinglePipe(source, fn, matcher));
 
 		} else if (_.isRegExp(matcher)) {
 			// wildcard key
 
-			// loop through source object ALL properties (including inherited)
+			// loop through source object ALL properties
+			// (including inherited)
 			for (var key in source) {
-				if (matcher.test(key)) {
 
-					var value = source[key];
-
-					// if the matcher regexp effectively matches
-					// the key, execute the fn passign the source[key]
-					// value as first argument.
-					res.push(fn(value, key));
+				// exec pipe for keys that match the matcher
+				if (matcher.test(key) && this.changed(key)) {
+					res.push(execSinglePipe(source, fn, key))
 				}
+
 			}
 		}
 
@@ -56,15 +81,39 @@ define(function (require, exports, module) {
 	 * [exports description]
 	 * @return {[type]} [description]
 	 */
-	function inject() {
+	exports.push = function push(lines) {
 
-		// actions: { actionName: what to do with value.. }
-		var results = _.map(this.actions, execAction, this);
+		var defer = q.defer();
 
-		return q.all(results);
-	}
+		// pick the lines to be executed.
+		// defaults to ALL
+		lines = lines ? _.pick(this.lines, lines) : this.lines;
 
-	exports.inject = inject;
-	exports.pump   = inject;
-	exports.push   = inject;
+		// execute pipelines
+		var results = _.map(lines, execPipeLine, this);
+
+		// update cache
+		_.assign(this.cache, __closure.cacheTmp);
+		__closure.cacheTmp = {};
+
+		q.all(results).done(function () {
+			// resolve with no arguments.
+			defer.resolve();
+		});
+
+		return defer.promise;
+	};
+
+	/**
+	 * Sets data onto source AND pushes.
+	 *
+	 * @param  {[type]} data [description]
+	 * @return {[type]}      [description]
+	 */
+	exports.inject = function inject(data) {
+
+		_.assign(this.source, data);
+
+		return this.push();
+	};
 });

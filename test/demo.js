@@ -49,25 +49,23 @@
 
 
 			// instantiate
-			// pipe(source, destination, map);
-			// map: { keyOnSource: function (valueOnSource) {} }
-			//      { keyOnSource: 'methodOnDestination' }
-			//      { keyOnSource: { complex definition }}
-			//      { keyOnSource: [multiple mappings for the same key] }
-			var dataPipe = pipe(source, destination, {
+			// pipe(actions, options {source, destination, cache})
+			var dataPipe = pipe({
 
 				sourceK1: 'm1',
 				sourceK2: 'm2',
 
 				'source*': 'notify'
-			});
+			})
+			.from(source)
+			.to(destination);
 
 			// set some data on source
 			source.sourceK1 = 'value-1';
 			source.sourceK2 = 'value-2';
 
 			// execute
-			dataPipe.inject();
+			dataPipe.push();
 
 			// check that destination methods were run.
 			destination.k1.should.eql('value-1');
@@ -76,10 +74,10 @@
 			destination.notifications.sourceK1.should.eql(['value-1']);
 			destination.notifications.sourceK2.should.eql(['value-2']);
 
-			// change data and inject again
+			// change data and push again
 			source.sourceK1 = 'value-1-2';
 			source.sourceK2 = 'value-2-2';
-			dataPipe.inject();
+			dataPipe.push();
 
 			destination.k1.should.eql('value-1-2');
 			destination.k2.should.eql('value-2-2');

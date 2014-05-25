@@ -2,9 +2,9 @@
 
 	var mod = typeof define !== 'function' ?
 		// node
-		'../src/__pipe/build-actions/action-matcher' :
+		'../src/__pipe/auxiliary' :
 		// browser
-		'__pipe/build-actions/action-matcher',
+		'__pipe/auxiliary',
 		// dependencies for the test
 		deps = [mod, 'should'];
 
@@ -16,26 +16,26 @@
 		define(deps, factory);
 	}
 
-})('test', function(actionMatcher, should) {
+})('test', function(aux, should) {
 	'use strict';
 
-	describe('actionMatcher action-matcher', function () {
+	describe('aux.wildcard action-matcher', function () {
 
 		it('plain key (noAsteriskKey)', function () {
 
-			actionMatcher('someKey').should.eql('someKey');
+			aux.wildcard('someKey').should.eql('someKey');
 
 		});
 
 		it('wildcard at end key (prefix*)', function () {
-			var matcher = actionMatcher('someKey*');
+			var matcher = aux.wildcard('someKey*');
 
 			matcher.test('someKeyWhatever').should.be.true;
 			matcher.test('someOtherKeyWhatever').should.be.false;
 		});
 
 		it('wildcard at beginning key (*Suffix)', function () {
-			var matcher = actionMatcher('*SomeKey');
+			var matcher = aux.wildcard('*SomeKey');
 
 			matcher.test('whateverSomeKey').should.be.true;
 			matcher.test('SomeKey').should.be.true;
@@ -43,7 +43,7 @@
 		});
 
 		it('wildcard in middle key (prefix*Suffix)', function () {
-			var matcher = actionMatcher('prefix*Suffix');
+			var matcher = aux.wildcard('prefix*Suffix');
 
 			matcher.test('prefixWhateverSuffix').should.be.true;
 			matcher.test('prefixWhatever').should.be.false;
@@ -52,7 +52,7 @@
 
 		it('beginning and end (*Middle*)', function () {
 
-			var matcher = actionMatcher('*Middle*');
+			var matcher = aux.wildcard('*Middle*');
 
 			matcher.test('whateverMiddleEnd').should.be.true;
 			matcher.test('whateverNomiddleEnd').should.be.false;
@@ -60,7 +60,7 @@
 		});
 
 		it('whatever (*)', function () {
-			var matcher = actionMatcher('*');
+			var matcher = aux.wildcard('*');
 
 			matcher.test('anything').should.be.true;
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/__pipe/build-actions/index.js - pipe</title>
+    <title>src/__pipe/mapping.js - pipe</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -82,7 +82,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/__pipe/build-actions/index.js</h1>
+                        <h1 class="file-heading">File: src/__pipe/mapping.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -93,127 +93,41 @@ if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefin
 define(function (require, exports, module) {
 	&#x27;use strict&#x27;;
 
-
-	var _ = require(&#x27;lodash&#x27;),
-		q = require(&#x27;q&#x27;);
-
-	var actionMatcher = require(&#x27;./action-matcher&#x27;);
-
-	///////////
-	// ARRAY //
-	///////////
+	var _ = require(&#x27;lodash&#x27;);
 
 	/**
-	 * Invokes a list of functions.
-	 * @param  {[type]} fns   [description]
-	 * @return {[type]}       [description]
-	 */
-	function invokeFns(fns) {
-
-		var args = Array.prototype.slice.call(arguments, 1);
-
-		var results = _.map(fns, function (fn) {
-			return fn.apply(this, args);
-		});
-
-		// return promise
-		return q.all(results);
-	}
-
-	/**
-	 * Converts an array of action definitions and returns a function.
+	 * Defines destination(s)
 	 *
-	 * @param  {[type]} subActions [description]
-	 * @param  {[type]} actionName [description]
-	 * @return {[type]}            [description]
+	 * @param  {[type]} destinations [description]
+	 * @return {[type]}              [description]
 	 */
-	function arrayActionFn(subActions, actionName) {
+	exports.to = function pipeTo(destinations) {
+		destinations = _.isArray(destinations) ? destinations : [destinations];
 
-		var fns = _.map(subActions, function (action, index) {
-			// invoke build action
-			return actionFn.call(this, action, actionName);
+		this.destinations = destinations;
 
-		}, this);
-
-		// return a function that executes all subActions in order
-		return _.partial(invokeFns, fns);
-	}
-
-	///////////
-	// ARRAY //
-	///////////
-
-
-
-
-	////////////
-	// STRING //
-	////////////
-	function set(object, value, sourceKey) {
-		object[sourceKey] = value;
-	}
-
-	/**
-	 *
-	 * @param  {[type]} action     [description]
-	 * @param  {[type]} actionName [description]
-	 * @return {[type]}            [description]
-	 */
-	function stringActionFn(action, actionName) {
-
-		// [1] check if there is a method on the destination
-		//     corresponding to the action defined
-		if (this.destination[action] &amp;&amp; _.isFunction(this.destination[action])) {
-
-			// method mapping
-			return _.bind(this.destination[action], this.destination);
-		} else {
-
-			// property setting.
-			return _.partial(set, this.destination);
-		}
-
-
-	}
-
-	/**
-	 * Given an action of any format,
-	 * returns a function to be executed.
-	 *
-	 * @param  {[type]} action     [description]
-	 * @param  {[type]} actionName [description]
-	 * @return {[type]}            [description]
-	 */
-	function actionFn(action, actionName) {
-		if (_.isString(action)) {
-			// invoke destination method.
-			return stringActionFn.call(this, action, actionName);
-
-		} else if (_.isArray(action)) {
-			// multiple actions
-			return arrayAction.call(this, action, actionName);
-
-		} else if (_.isFunction(action)) {
-			return action;
-		}
-	}
-
-	/**
-	 * Takes a hash of actions and returns an array of action objects.
-	 *
-	 * @param  {[type]} actions [description]
-	 * @return {[type]}         [description]
-	 */
-	module.exports = function buildActions(actions) {
-		return _.map(actions, function (action, actionName) {
-
-			return {
-				fn     : actionFn.call(this, action, actionName),
-				matcher: actionMatcher(actionName)
-			};
-
-		}, this);
+		return this;
 	};
+
+	exports.rmDestination = function pipeRmDestination(name) {
+
+	};
+
+	/**
+	 * Defines the source.
+	 *
+	 * @param  {[type]} source [description]
+	 * @return {[type]}        [description]
+	 */
+	exports.from = function pipeFrom(source) {
+		// restart cache
+		this.cache = {};
+
+		this.source = source;
+
+		return this;
+	};
+
 });
 
     </pre>

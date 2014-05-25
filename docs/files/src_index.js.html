@@ -103,22 +103,61 @@ if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefin
 define(function (require, exports, module) {
 	&#x27;use strict&#x27;;
 
-	var subject = require(&#x27;subject&#x27;);
+	var subject = require(&#x27;subject&#x27;),
+		_       = require(&#x27;lodash&#x27;);
 
-	var buildActions = require(&#x27;./__pipe/build-actions/index&#x27;);
 
 	var pipe = module.exports = subject({
-		initialize: function initialize(source, destination, actions) {
 
-			this.source      = source;
-			this.cache       = {};
 
-			this.destination = destination;
-			this.actions     = buildActions.call(this, actions);
+		/**
+		 * [initialize description]
+		 * @param  {[type]} pipelines [description]
+		 * @param  {[type]} options   [description]
+		 * @return {[type]}           [description]
+		 */
+		initialize: function initialize(pipelines, options) {
+
+			options = options || {};
+
+			this.source = {};
+			if (options.source) {
+				this.from(source);
+			}
+
+			if (options.destination) {
+				this.to(options.destination);
+			}
+
+			// the cache. if set to false, no cache will be used.
+			this.cache = options.cache === false ? false : {};
+
+			// object on which pipelines will be stored.
+			this.lines = {};
+			// build pipelines
+			_.each(pipelines, function (pipeline, name) {
+
+				this.line(name, pipeline);
+
+			}, this);
+		},
+
+
+		/**
+		 * Checks if a property has uncached changes on the source
+		 *
+		 * @param  {[type]} prop [description]
+		 * @return {[type]}      [description]
+		 */
+		changed: function changed(prop) {
+			return this.source[prop] !== this.cache[prop];
 		},
 	});
 
-	pipe.assignProto(require(&#x27;./__pipe/stream-control&#x27;))
+	// prototype
+	pipe.assignProto(require(&#x27;./__pipe/mapping&#x27;))
+		.assignProto(require(&#x27;./__pipe/stream-control&#x27;))
+		.assignProto(require(&#x27;./__pipe/line/index&#x27;));
 });
 
     </pre>
