@@ -19,10 +19,16 @@ define(function (require, exports, module) {
 	var subject = require('subject'),
 		_       = require('lodash');
 
+	var build   = require('./__pipe/build-actions');
+
 
 	var pipe = module.exports = subject({
-		initialize: function initialize(options) {
+		initialize: function initialize(source, destination, actions) {
 
+
+			this.source      = source;
+			this.destination = destination;
+			this.actions     = build.call(this, actions);
 		},
 	});
 });
