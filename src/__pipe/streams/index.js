@@ -5,10 +5,8 @@ if (typeof define !== 'function') { var define = require('amdefine')(module) }
 define(function (require, exports, module) {
 	'use strict';
 
-
 	var _ = require('lodash'),
 		q = require('q');
-
 
 	/**
 	 * runs action with lines.
@@ -30,7 +28,7 @@ define(function (require, exports, module) {
 		var results = _.map(lines, function (destProps, srcProp) {
 
 			// run the action
-			streamFn.call(this, srcProp, destProps);
+			return streamFn.call(this, srcProp, destProps);
 
 		}, this);
 
@@ -46,86 +44,16 @@ define(function (require, exports, module) {
 	}
 
 	/**
-	 * Runs a single line
-	 * testing its matcher across all properties of the source object.
-	 *
-	 * [pumpPipe description]
-	 * @param  {[type]} def [description]
-	 * @return {Promise}     [description]
-	 */
-	function pumpPipeline(srcProp, destProps) {
-
-		// [1] GET value from SOURCE
-		var value = this._srcGet(this.source, srcProp);
-
-		// [2] check if cached value is the same as
-		//     current value
-		if (value !== this.cache.src[srcProp]) {
-			// if value is different from the one in cache
-			// do setting
-
-			// [2.1] set destination properties
-			var res = _.map(destProps, function (prop) {
-
-				// [2.1.1] set on all destinations
-				var destSetRes = _.map(this.destinations, function (destination) {
-
-					// [2.1.1.1] SET value onto DESTINATION
-					return this._destSet(destination, prop, value);
-				}, this);
-
-				// [2.1.2] return a promise for
-				//         when all destination-settings are done.
-				return q.all(destSetRes);
-
-			}, this);
-
-
-			// [3] set value to cache
-			this.cache.src[srcProp] = value;
-
-			// [4] return a promise for when all property-settings are done.
-			return q.all(res);
-		}
-
-		// else: return undefined.
-	}
-
-
-
-	/**
-	 * [drainPipeline description]
-	 * @param  {[type]} srcProp   [description]
-	 * @param  {[type]} destProps [description]
-	 * @return {[type]}           [description]
-	 */
-	function drainPipeline(srcProp, destProps) {
-
-		// [1] GET value from the first DESTINATION (destinations[0])
-		var value = this._destGet(this.destinations[0], destProps[0]);
-
-		// [2] check cache
-		if (value !== this.cache.dest[destProps]) {
-
-			// [2.1] SET value onto SOURCE
-			return this._srcSet(this.source, srcProp, value);
-		}
-
-		// else: return undefined
-	}
-
-
-	/**
 	 * [exports description]
 	 * @return {[type]} [description]
 	 */
-	exports.pump = _.partial(streamPipeline, pumpPipeline);
+	exports.pump = _.partial(streamPipeline, require('./pump'));
 
 	/**
 	 * [drain description]
 	 * @type {[type]}
 	 */
-	exports.drain = _.partial(streamPipeline, drainPipeline);
+	exports.drain = _.partial(streamPipeline, require('./drain'));
 
 	/**
 	 * Sets data onto source AND pumpes.

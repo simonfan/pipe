@@ -80,13 +80,135 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 
 /* jshint ignore:end */
 
-define('__pipe/streams',['require','exports','module','lodash','q'],function (require, exports, module) {
+define('__pipe/streams/pump',['require','exports','module','lodash','q'],function (require, exports, module) {
 	
 
 
 	var _ = require('lodash'),
 		q = require('q');
 
+
+	/**
+	 * SINGLE DESTINATION
+	 *
+	 * @param  {[type]} value       [description]
+	 * @param  {[type]} destination [description]
+	 * @param  {[type]} properties  [description]
+	 * @return {[type]}             [description]
+	 */
+	function pumpValueToDestination(value, destination, properties) {
+
+
+		var res = _.map(properties, function (prop) {
+
+			// [2.1.1.1] SET value onto DESTINATION
+			return this._destSet(destination, prop, value);
+
+		}, this);
+
+		return q.all(res);
+	}
+
+	/**
+	 * MULTIPLE DESTINATIONS
+	 *
+	 * @param  {[type]} value        [description]
+	 * @param  {[type]} destinations [description]
+	 * @param  {[type]} properties   [description]
+	 * @return {[type]}              [description]
+	 */
+	function pumpValueToDestinations(value, destinations, properties) {
+
+		var res = _.map(destinations, function (dest) {
+
+			return pumpValueToDestination.call(this, value, dest, properties);
+
+		}, this);
+
+		return q.all(res);
+	}
+
+	/**
+	 * Runs a single line
+	 * testing its matcher across all properties of the source object.
+	 *
+	 * [pumpPipe description]
+	 * @param  {[type]} def [description]
+	 * @return {Promise}     [description]
+	 */
+	module.exports = function pump(srcProp, destProps) {
+
+
+		var destinations = this.destinations;
+
+		// [1] GET value from SOURCE
+		return q(this._srcGet(this.source, srcProp))
+			// [2] promise then
+			.then(_.bind(function (value) {
+
+				// [2.1] check if cached value is the same as
+				//       current value
+				if (value !== this.cache.src[srcProp]) {
+
+					// [2.2] set value to cache
+					this.cache.src[srcProp] = value;
+
+					// [3] resolve pumpDefer agter
+					//     value has been pumped to destinations
+					return pumpValueToDestinations.call(this, value, destinations, destProps)
+
+
+				}// else return nothing, solve immediately
+
+			}, this))
+			.fail(function (e) { throw e; });
+	};
+});
+
+/* jshint ignore:start */
+
+/* jshint ignore:end */
+
+define('__pipe/streams/drain',['require','exports','module','lodash','q'],function (require, exports, module) {
+	
+
+
+	var _ = require('lodash'),
+		q = require('q');
+
+	/**
+	 * [drainPipeline description]
+	 * @param  {[type]} srcProp   [description]
+	 * @param  {[type]} destProps [description]
+	 * @return {[type]}           [description]
+	 */
+	module.exports = function drainPipeline(srcProp, destProps) {
+
+		// [1] GET value from the first DESTINATION (destinations[0])
+		return q(this._destGet(this.destinations[0], destProps[0]))
+			.then(_.bind(function (value) {
+				// [2] check cache
+				if (value !== this.cache.dest[destProps]) {
+
+					// [2.1] SET value onto SOURCE
+					return this._srcSet(this.source, srcProp, value);
+				} // else: return undefined (solve immediately)
+			}, this))
+			.fail(function (e) { throw e; });
+
+	};
+
+});
+
+/* jshint ignore:start */
+
+/* jshint ignore:end */
+
+define('__pipe/streams/index',['require','exports','module','lodash','q','./pump','./drain'],function (require, exports, module) {
+	
+
+	var _ = require('lodash'),
+		q = require('q');
 
 	/**
 	 * runs action with lines.
@@ -97,97 +219,43 @@ define('__pipe/streams',['require','exports','module','lodash','q'],function (re
 	 */
 	function streamPipeline(streamFn, lines) {
 
+		// [1] create a deferred object.
 		var defer = q.defer();
 
-		// pick the lines to be executed.
-		// defaults to ALL
+		// [2] pick the lines to be executed.
+		//     defaults to ALL
 		lines = lines ? _.pick(this.lines, lines) : this.lines;
 
+		// [3] call the streamFn for all lines.
 		var results = _.map(lines, function (destProps, srcProp) {
 
 			// run the action
-			streamFn.call(this, srcProp, destProps);
+			return streamFn.call(this, srcProp, destProps);
 
 		}, this);
 
+		// [4] resolve the deferred object with NO VALUES
+		//     when all the streamFn invocations have been completed.
 		q.all(results).done(function () {
 			// resolve with no arguments.
 			defer.resolve();
 		});
 
+		// [5] return the promise.
 		return defer.promise;
 	}
-
-
-
-	/**
-	 * Runs a single line
-	 * testing its matcher across all properties of the source object.
-	 *
-	 * [pumpPipe description]
-	 * @param  {[type]} def [description]
-	 * @return {Promise}     [description]
-	 */
-	function pumpPipeline(srcProp, destProps) {
-
-		var value = this._srcGet(this.source, srcProp);
-
-		if (value !== this.cache.src[srcProp]) {
-			// if value is different from the one in cache
-			// do setting
-
-			var res = _.map(destProps, function (prop) {
-
-				// set on all destinations
-				var setPropRes = _.map(this.destinations, function (destination) {
-
-					// set on single destination
-					return this._destSet(destination, prop, value);
-				}, this);
-
-				q.all(setPropRes);
-
-			}, this);
-
-
-			// set value to cache
-			// ONLY WHEN ALL PIPES HAVE BEEN RUN.
-			this.cache.src[srcProp] = value;
-
-			return q.all(res)
-		}
-	}
-
-
-
-	/**
-	 * [drainPipeline description]
-	 * @param  {[type]} srcProp   [description]
-	 * @param  {[type]} destProps [description]
-	 * @return {[type]}           [description]
-	 */
-	function drainPipeline(srcProp, destProps) {
-
-		var value = this._destGet(this.destinations[0], destProps[0]);
-
-			// check cache
-		if (value !== this.cache.dest[destProps]) {
-			return this._srcSet(this.source, srcProp, value);
-		}
-	}
-
 
 	/**
 	 * [exports description]
 	 * @return {[type]} [description]
 	 */
-	exports.pump = _.partial(streamPipeline, pumpPipeline);
+	exports.pump = _.partial(streamPipeline, require('./pump'));
 
 	/**
 	 * [drain description]
 	 * @type {[type]}
 	 */
-	exports.drain = _.partial(streamPipeline, drainPipeline);
+	exports.drain = _.partial(streamPipeline, require('./drain'));
 
 	/**
 	 * Sets data onto source AND pumpes.
@@ -197,22 +265,30 @@ define('__pipe/streams',['require','exports','module','lodash','q'],function (re
 	 */
 	exports.inject = function inject(data) {
 
+		// [0] throw error if there is no source in the pipe object.
 		if (!this.source) {
 			throw new Error('No source for pipe');
 		}
 
-		var setRes = _.map(data, function (value, key) {
+		// [1] SET all data onto the SOURCE
+		var srcSetRes = _.map(data, function (value, key) {
 
 			return this._srcSet(this.source, key, value);
 
 		}, this);
 
-		return q.all(setRes)
-				.then(_.bind(function () {
-					return this.pump();
-				}, this), function (e) {
-					throw e;
-				});
+
+		// [2] wait for all srcSets
+		return q.all(srcSetRes).then(
+
+			// [2.1] then invoke pump on success
+			//       wrap in a method in order to guarantee
+			//       pump is invoked with NO ARGUMENTS
+			_.bind(function() { this.pump(); }, this),
+
+			// [2.2] or throw error
+			function (e) { throw e; }
+		);
 	};
 });
 
@@ -285,7 +361,7 @@ define('__pipe/line',['require','exports','module','lodash'],function (require, 
 
 /* jshint ignore:end */
 
-define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping','./__pipe/streams','./__pipe/line'],function (require, exports, module) {
+define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping','./__pipe/streams/index','./__pipe/line'],function (require, exports, module) {
 	
 
 	var subject = require('subject'),
@@ -369,7 +445,7 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 
 	// prototype
 	pipe.assignProto(require('./__pipe/mapping'))
-		.assignProto(require('./__pipe/streams'))
+		.assignProto(require('./__pipe/streams/index'))
 		.assignProto(require('./__pipe/line'));
 });
 

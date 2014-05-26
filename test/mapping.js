@@ -21,7 +21,7 @@
 
 	describe('pipe mapping', function () {
 
-		it('pipe.from(source)', function () {
+		it('pipe.from(source)', function (testdone) {
 
 			var destination = {},
 				source1     = {
@@ -41,28 +41,38 @@
 			.to(destination);
 
 
-			p.pump();
+			p.pump()
+				.then(function () {
 
-			destination.should.eql({
-				'dest-key1': 'source-1-v1',
-				'dest-key2': 'source-1-v2'
-			});
+					destination.should.eql({
+						'dest-key1': 'source-1-v1',
+						'dest-key2': 'source-1-v2'
+					});
 
-			// change source
-			p.from(source2);
+				})
+				.then(function () {
+					// change source
+					p.from(source2);
 
-			p.pump();
-			destination.should.eql({
-				'dest-key1': 'source-2-v1',
-				'dest-key2': 'source-2-v2'
-			});
+					p.pump();
+				})
+				.then(function () {
+
+					destination.should.eql({
+						'dest-key1': 'source-2-v1',
+						'dest-key2': 'source-2-v2'
+					});
+
+					testdone();
+				})
+				.done();
 
 		});
 
 
 		describe('pipe destinations', function () {
 
-			it('pipe.to(destination)', function () {
+			it('pipe.to(destination)', function (testdone) {
 				var destination1 = {},
 					destination2 = {},
 					source       = {
@@ -77,32 +87,45 @@
 				.from(source)
 				.to(destination1);
 
-				p.pump();
-				destination1.should.eql({
-					'dest-key1': 'v1',
-					'dest-key2': 'v2'
-				});
+				p.pump()
+					.then(function () {
 
-				// change destination
-				p.to(destination2);
-				// set some values on source
-				source.key1 = 'v1-for-dest-2';
+						destination1.should.eql({
+							'dest-key1': 'v1',
+							'dest-key2': 'v2'
+						});
+					})
+					.then(function () {
 
-				p.pump();
-				destination2.should.eql({
-					'dest-key1': 'v1-for-dest-2',
-					'dest-key2': 'v2'
-				});
 
-				// destination1 remains unchanged
-				destination1.should.eql({
-					'dest-key1': 'v1',
-					'dest-key2': 'v2'
-				})
+						// change destination
+						p.to(destination2);
+						// set some values on source
+						source.key1 = 'v1-for-dest-2';
+
+						return p.pump();
+					})
+					.then(function () {
+
+						destination2.should.eql({
+							'dest-key1': 'v1-for-dest-2',
+							'dest-key2': 'v2'
+						});
+
+						// destination1 remains unchanged
+						destination1.should.eql({
+							'dest-key1': 'v1',
+							'dest-key2': 'v2'
+						});
+
+						testdone();
+
+					})
+					.done();
 			});
 
 
-			it('pipe.addDestinations(dest)', function () {
+			it('pipe.addDestinations(dest)', function (testdone) {
 
 				var destination1 = {},
 					destination2 = {},
@@ -120,21 +143,34 @@
 
 				p.addDestination(destination1);
 
-				p.pump();
-				destination1.dkey1.should.eql('v1');
-				destination1.dkey2.should.eql('v2');
+				p.pump()
+					.then(function () {
+
+						destination1.dkey1.should.eql('v1');
+						destination1.dkey2.should.eql('v2');
+					})
+					.then(function () {
+
+						p.addDestination(destination2);
+						source.key1 = 'v1-altered';
+
+						return p.pump();
+					})
+					.then(function () {
+						destination1.should.eql(destination2);
+						destination2.dkey1.should.eql('v1-altered');
+						destination2.dkey2.should.eql('v2');
 
 
-				p.addDestination(destination2);
-				source.key1 = 'v1-altered';
+						testdone();
+					})
+					.done();
 
-				p.pump();
-				destination1.should.eql(destination2);
-				destination2.dkey1.should.eql('v1-altered');
-				destination2.dkey2.should.eql('v2');
+
+
 			});
 
-			it('pipe.removeDestination()', function () {
+			it('pipe.removeDestination()', function (testdone) {
 
 				var destination1 = { id: '1' },
 					destination2 = { id: '2' },
@@ -150,29 +186,40 @@
 				.from(source)
 				.to([destination1, destination2]);
 
-				p.pump();
-				destination1.dkey1.should.eql('v1');
-				destination1.dkey2.should.eql('v2');
-				destination2.dkey1.should.eql('v1');
-				destination2.dkey2.should.eql('v2');
+				p.pump()
+					.then(function () {
 
-				// remove destination1
-				p.removeDestination(function (dest) {
-					return dest.id === '1';
-				});
+						destination1.dkey1.should.eql('v1');
+						destination1.dkey2.should.eql('v2');
+						destination2.dkey1.should.eql('v1');
+						destination2.dkey2.should.eql('v2');
+					})
+					.then(function () {
+						// remove destination1
+						p.removeDestination(function (dest) {
+							return dest.id === '1';
+						});
 
-				// alter source
-				source.key1 = 'v1-altered';
-				source.key2 = 'v2-altered';
+						// alter source
+						source.key1 = 'v1-altered';
+						source.key2 = 'v2-altered';
 
-				p.pump();
-				// removed destination remains unaltered
-				destination1.dkey1.should.eql('v1', 'removed destination remains unaltered');
-				destination1.dkey2.should.eql('v2', 'removed destination remains unaltered');
+						p.pump();
+					})
+					.then(function () {
 
-				// remaining destination changes
-				destination2.dkey1.should.eql('v1-altered');
-				destination2.dkey2.should.eql('v2-altered');
+						// removed destination remains unaltered
+						destination1.dkey1.should.eql('v1', 'removed destination remains unaltered');
+						destination1.dkey2.should.eql('v2', 'removed destination remains unaltered');
+
+						// remaining destination changes
+						destination2.dkey1.should.eql('v1-altered');
+						destination2.dkey2.should.eql('v2-altered');
+
+
+						testdone();
+					})
+					.done();
 
 			});
 

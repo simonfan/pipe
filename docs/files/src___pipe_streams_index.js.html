@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/__pipe/streams.js - pipe</title>
+    <title>src/__pipe/streams/index.js - pipe</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -82,7 +82,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/__pipe/streams.js</h1>
+                        <h1 class="file-heading">File: src/__pipe/streams/index.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -93,10 +93,8 @@ if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefin
 define(function (require, exports, module) {
 	&#x27;use strict&#x27;;
 
-
 	var _ = require(&#x27;lodash&#x27;),
 		q = require(&#x27;q&#x27;);
-
 
 	/**
 	 * runs action with lines.
@@ -107,97 +105,43 @@ define(function (require, exports, module) {
 	 */
 	function streamPipeline(streamFn, lines) {
 
+		// [1] create a deferred object.
 		var defer = q.defer();
 
-		// pick the lines to be executed.
-		// defaults to ALL
+		// [2] pick the lines to be executed.
+		//     defaults to ALL
 		lines = lines ? _.pick(this.lines, lines) : this.lines;
 
+		// [3] call the streamFn for all lines.
 		var results = _.map(lines, function (destProps, srcProp) {
 
 			// run the action
-			streamFn.call(this, srcProp, destProps);
+			return streamFn.call(this, srcProp, destProps);
 
 		}, this);
 
+		// [4] resolve the deferred object with NO VALUES
+		//     when all the streamFn invocations have been completed.
 		q.all(results).done(function () {
 			// resolve with no arguments.
 			defer.resolve();
 		});
 
+		// [5] return the promise.
 		return defer.promise;
 	}
-
-
-
-	/**
-	 * Runs a single line
-	 * testing its matcher across all properties of the source object.
-	 *
-	 * [pumpPipe description]
-	 * @param  {[type]} def [description]
-	 * @return {Promise}     [description]
-	 */
-	function pumpPipeline(srcProp, destProps) {
-
-		var value = this._srcGet(this.source, srcProp);
-
-		if (value !== this.cache.src[srcProp]) {
-			// if value is different from the one in cache
-			// do setting
-
-			var res = _.map(destProps, function (prop) {
-
-				// set on all destinations
-				var setPropRes = _.map(this.destinations, function (destination) {
-
-					// set on single destination
-					return this._destSet(destination, prop, value);
-				}, this);
-
-				q.all(setPropRes);
-
-			}, this);
-
-
-			// set value to cache
-			// ONLY WHEN ALL PIPES HAVE BEEN RUN.
-			this.cache.src[srcProp] = value;
-
-			return q.all(res)
-		}
-	}
-
-
-
-	/**
-	 * [drainPipeline description]
-	 * @param  {[type]} srcProp   [description]
-	 * @param  {[type]} destProps [description]
-	 * @return {[type]}           [description]
-	 */
-	function drainPipeline(srcProp, destProps) {
-
-		var value = this._destGet(this.destinations[0], destProps[0]);
-
-			// check cache
-		if (value !== this.cache.dest[destProps]) {
-			return this._srcSet(this.source, srcProp, value);
-		}
-	}
-
 
 	/**
 	 * [exports description]
 	 * @return {[type]} [description]
 	 */
-	exports.pump = _.partial(streamPipeline, pumpPipeline);
+	exports.pump = _.partial(streamPipeline, require(&#x27;./pump&#x27;));
 
 	/**
 	 * [drain description]
 	 * @type {[type]}
 	 */
-	exports.drain = _.partial(streamPipeline, drainPipeline);
+	exports.drain = _.partial(streamPipeline, require(&#x27;./drain&#x27;));
 
 	/**
 	 * Sets data onto source AND pumpes.
@@ -207,22 +151,30 @@ define(function (require, exports, module) {
 	 */
 	exports.inject = function inject(data) {
 
+		// [0] throw error if there is no source in the pipe object.
 		if (!this.source) {
 			throw new Error(&#x27;No source for pipe&#x27;);
 		}
 
-		var setRes = _.map(data, function (value, key) {
+		// [1] SET all data onto the SOURCE
+		var srcSetRes = _.map(data, function (value, key) {
 
 			return this._srcSet(this.source, key, value);
 
 		}, this);
 
-		return q.all(setRes)
-				.then(_.bind(function () {
-					return this.pump();
-				}, this), function (e) {
-					throw e;
-				});
+
+		// [2] wait for all srcSets
+		return q.all(srcSetRes).then(
+
+			// [2.1] then invoke pump on success
+			//       wrap in a method in order to guarantee
+			//       pump is invoked with NO ARGUMENTS
+			_.bind(function() { this.pump(); }, this),
+
+			// [2.2] or throw error
+			function (e) { throw e; }
+		);
 	};
 });
 

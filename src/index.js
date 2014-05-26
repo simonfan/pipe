@@ -96,6 +96,6 @@ define(function (require, exports, module) {
 
 	// prototype
 	pipe.assignProto(require('./__pipe/mapping'))
-		.assignProto(require('./__pipe/streams'))
+		.assignProto(require('./__pipe/streams/index'))
 		.assignProto(require('./__pipe/line'));
 });

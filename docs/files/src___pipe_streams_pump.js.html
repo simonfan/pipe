@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/index.js - pipe</title>
+    <title>src/__pipe/streams/pump.js - pipe</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -82,20 +82,10 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/index.js</h1>
+                        <h1 class="file-heading">File: src/__pipe/streams/pump.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-//     pipe
-//     (c) simonfan
-//     pipe is licensed under the MIT terms.
-
-/**
- * AMD and CJS module.
- *
- * @module pipe
- */
-
 /* jshint ignore:start */
 if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefine&#x27;)(module) }
 /* jshint ignore:end */
@@ -103,89 +93,86 @@ if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefin
 define(function (require, exports, module) {
 	&#x27;use strict&#x27;;
 
-	var subject = require(&#x27;subject&#x27;),
-		_       = require(&#x27;lodash&#x27;);
+
+	var _ = require(&#x27;lodash&#x27;),
+		q = require(&#x27;q&#x27;);
 
 
-	var extensionOptionNames = [&#x27;srcGet&#x27;, &#x27;srcSet&#x27;, &#x27;destGet&#x27;, &#x27;destSet&#x27;];
-
-	var pipe = module.exports = subject({
-
-
-		/**
-		 * [initialize description]
-		 * @param  {[type]} mappings [description]
-		 * @param  {[type]} options   [description]
-		 * @return {[type]}           [description]
-		 */
-		initialize: function initialize(lines, options) {
-
-			options = options || {};
-
-			// some default options
-			_.each(extensionOptionNames, function (opt) {
-				this[opt] = options[opt] || this[opt];
-			}, this);
-
-			// _*get and _*set methods.
-			this._srcGet = this.srcGet || this.get;
-			this._srcSet = this.srcSet || this.set;
-			this._destGet = this.destGet || this.get;
-			this._destSet = this.destSet || this.set;
-
-			// the cache. if set to false, no cache will be used.
-			this.cache = options.cache === false ? false : {
-				src: {},
-				dest: {},
-			};
-
-			if (options.source) {
-				this.from(source);
-			}
-
-			if (options.destination) {
-				this.to(options.destination);
-			}
-
-			// object on which line mappings will be stored.
-			this.lines = {};
-			this.line(lines);
-		},
-
-		get: function pipeGet(object, property) {
-			return object[property];
-		},
-
-		set: function pipeSet(object, property, value) {
-			object[property] = value;
-
-			return object;
-		},
-
-/*
-
-	exports.srcGet
-	exports.srcSet
-
-	exports.destGet
-	exports.destSet
-*/
+	/**
+	 * SINGLE DESTINATION
+	 *
+	 * @param  {[type]} value       [description]
+	 * @param  {[type]} destination [description]
+	 * @param  {[type]} properties  [description]
+	 * @return {[type]}             [description]
+	 */
+	function pumpValueToDestination(value, destination, properties) {
 
 
-		clearCache: function clearCache() {
-			this.cache = {
-				src: {},
-				dest: {},
-			};
+		var res = _.map(properties, function (prop) {
 
-			return this;
-		},
-	});
+			// [2.1.1.1] SET value onto DESTINATION
+			return this._destSet(destination, prop, value);
 
-	// prototype
-	pipe.assignProto(require(&#x27;./__pipe/mapping&#x27;))
-		.assignProto(require(&#x27;./__pipe/streams/index&#x27;))
-		.assignProto(require(&#x27;./__pipe/line&#x27;));
+		}, this);
+
+		return q.all(res);
+	}
+
+	/**
+	 * MULTIPLE DESTINATIONS
+	 *
+	 * @param  {[type]} value        [description]
+	 * @param  {[type]} destinations [description]
+	 * @param  {[type]} properties   [description]
+	 * @return {[type]}              [description]
+	 */
+	function pumpValueToDestinations(value, destinations, properties) {
+
+		var res = _.map(destinations, function (dest) {
+
+			return pumpValueToDestination.call(this, value, dest, properties);
+
+		}, this);
+
+		return q.all(res);
+	}
+
+	/**
+	 * Runs a single line
+	 * testing its matcher across all properties of the source object.
+	 *
+	 * [pumpPipe description]
+	 * @param  {[type]} def [description]
+	 * @return {Promise}     [description]
+	 */
+	module.exports = function pump(srcProp, destProps) {
+
+
+		var destinations = this.destinations;
+
+		// [1] GET value from SOURCE
+		return q(this._srcGet(this.source, srcProp))
+			// [2] promise then
+			.then(_.bind(function (value) {
+
+				// [2.1] check if cached value is the same as
+				//       current value
+				if (value !== this.cache.src[srcProp]) {
+
+					// [2.2] set value to cache
+					this.cache.src[srcProp] = value;
+
+					// [3] resolve pumpDefer agter
+					//     value has been pumped to destinations
+					return pumpValueToDestinations.call(this, value, destinations, destProps)
+
+
+				}// else return nothing, solve immediately
+
+			}, this))
+			.fail(function (e) { throw e; });
+	};
 });
 
     </pre>
