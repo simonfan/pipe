@@ -36,26 +36,24 @@
 			destination.m4 = _.partial(set, destination, 'k4');
 
 
-			destination.notifications = {};
-			destination.notify = function notify(sourceKey, value) {
-				this.notifications[sourceKey] = this.notifications[sourceKey] ?
-					this.notifications[sourceKey].concat(value) :
-					[value];
-			};
-
-
 			// create a source object
 			var source = {};
+
+			// create class
+			var dpipe = pipe.extend({
+				set: function (destination, property, value) {
+
+					destination[property](value);
+				},
+			})
 
 
 			// instantiate
 			// pipe(actions, options {source, destination, cache})
-			var dataPipe = pipe({
+			var dataPipe = dpipe({
 
 				sourceK1: 'm1',
 				sourceK2: 'm2',
-
-				'source*': 'notify'
 			})
 			.from(source)
 			.to(destination);
@@ -65,26 +63,19 @@
 			source.sourceK2 = 'value-2';
 
 			// execute
-			dataPipe.push();
+			dataPipe.pump();
 
 			// check that destination methods were run.
 			destination.k1.should.eql('value-1');
 			destination.k2.should.eql('value-2');
 
-			destination.notifications.sourceK1.should.eql(['value-1']);
-			destination.notifications.sourceK2.should.eql(['value-2']);
-
 			// change data and push again
 			source.sourceK1 = 'value-1-2';
 			source.sourceK2 = 'value-2-2';
-			dataPipe.push();
+			dataPipe.pump();
 
 			destination.k1.should.eql('value-1-2');
 			destination.k2.should.eql('value-2-2');
-			destination.notifications.should.eql({
-				sourceK1: ['value-1', 'value-1-2'],
-				sourceK2: ['value-2', 'value-2-2']
-			});
 		});
 	});
 });

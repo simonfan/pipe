@@ -21,8 +21,31 @@ define(function (require, exports, module) {
 		return this;
 	};
 
-	exports.rmDestination = function pipeRmDestination(name) {
+	/**
+	 * [addDestinations description]
+	 * @param {[type]} destinations [description]
+	 */
+	exports.addDestinations = function pipeAddDestination(destinations) {
 
+		destinations = _.isArray(destinations) ? destinations : [destinations];
+
+		this.destinations = this.destinations.concat(destinations);
+
+		return this;
+
+	};
+
+	/**
+	 * [rmDestinations description]
+	 * @param  {[type]} criteria [description]
+	 * @param  {[type]} context  [description]
+	 * @return {[type]}          [description]
+	 */
+	exports.rmDestinations = function pipeRmDestination(criteria, context) {
+
+		this.destinations = _.remove(this.destinations, criteria, context);
+
+		return this;
 	};
 
 	/**
@@ -33,7 +56,10 @@ define(function (require, exports, module) {
 	 */
 	exports.from = function pipeFrom(source) {
 		// restart cache
-		this.cache = {};
+		this.cache = {
+			src: {},
+			dest: {}
+		};
 
 		this.source = source;
 

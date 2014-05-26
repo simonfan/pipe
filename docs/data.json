@@ -209,7 +209,7 @@
         },
         {
             "file": "src/__pipe/line/index.js",
-            "line": 44,
+            "line": 45,
             "description": "[rmLine description]",
             "params": [
                 {
@@ -453,7 +453,7 @@
         },
         {
             "message": "Missing item type\n[rmLine description]",
-            "line": " src/__pipe/line/index.js:44"
+            "line": " src/__pipe/line/index.js:45"
         },
         {
             "message": "Missing item type\nChecks whether the name accepts wildcards.\nIf so, returns a regexp.\nOtherwise, return a string, for exact matching.",

@@ -24,15 +24,20 @@ define(function (require, exports, module) {
 
 		/**
 		 * [initialize description]
-		 * @param  {[type]} pipelines [description]
+		 * @param  {[type]} mappings [description]
 		 * @param  {[type]} options   [description]
 		 * @return {[type]}           [description]
 		 */
-		initialize: function initialize(pipelines, options) {
+		initialize: function initialize(lines, options) {
 
 			options = options || {};
 
-			this.source = {};
+			// the cache. if set to false, no cache will be used.
+			this.cache = options.cache === false ? false : {
+				src: {},
+				dest: {},
+			};
+
 			if (options.source) {
 				this.from(source);
 			}
@@ -41,33 +46,34 @@ define(function (require, exports, module) {
 				this.to(options.destination);
 			}
 
-			// the cache. if set to false, no cache will be used.
-			this.cache = options.cache === false ? false : {};
-
-			// object on which pipelines will be stored.
+			// object on which line mappings will be stored.
 			this.lines = {};
-			// build pipelines
-			_.each(pipelines, function (pipeline, name) {
-
-				this.line(name, pipeline);
-
-			}, this);
+			this.line(lines);
 		},
 
-
-		/**
-		 * Checks if a property has uncached changes on the source
-		 *
-		 * @param  {[type]} prop [description]
-		 * @return {[type]}      [description]
-		 */
-		changed: function changed(prop) {
-			return this.source[prop] !== this.cache[prop];
+		get: function pipeGet(object, property) {
+			return object[property];
 		},
+
+		set: function pipeSet(object, property, value) {
+			object[property] = value;
+
+			return object;
+		},
+
+/*
+
+	exports.srcGet
+	exports.srcSet
+
+	exports.destGet
+	exports.destSet
+*/
+
 	});
 
 	// prototype
 	pipe.assignProto(require('./__pipe/mapping'))
-		.assignProto(require('./__pipe/stream-control'))
-		.assignProto(require('./__pipe/line/index'));
+		.assignProto(require('./__pipe/streams'))
+		.assignProto(require('./__pipe/line'));
 });

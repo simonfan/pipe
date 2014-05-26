@@ -381,7 +381,7 @@ define('__pipe/line/fn',['require','exports','module','lodash','q'],function (re
 
 		} else if (_.isArray(line)) {
 			// multiple lines
-			return arrayLine.call(this, line, lineName);
+			return arrayLineFn.call(this, line, lineName);
 
 		} else if (_.isFunction(line)) {
 			return line;
@@ -419,6 +419,7 @@ define('__pipe/line/index',['require','exports','module','../auxiliary','./fn'],
 			name       = '*';
 			definition = arguments[0];
 		} else {
+			// arguments: [name, definition, pull]
 			name       = arguments[0];
 			definition = arguments[1];
 		}

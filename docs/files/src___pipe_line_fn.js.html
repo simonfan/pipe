@@ -237,7 +237,7 @@ define(function (require, exports, module) {
 
 		} else if (_.isArray(line)) {
 			// multiple lines
-			return arrayLine.call(this, line, lineName);
+			return arrayLineFn.call(this, line, lineName);
 
 		} else if (_.isFunction(line)) {
 			return line;

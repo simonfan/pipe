@@ -5,10 +5,7 @@ if (typeof define !== 'function') { var define = require('amdefine')(module) }
 define(function (require, exports, module) {
 	'use strict';
 
-	var aux    = require('../auxiliary'),
-		// the fn parser
-		lineFn = require('./fn');
-
+	var _ = require('lodash');
 
 	/**
 	 * [line description]
@@ -18,28 +15,31 @@ define(function (require, exports, module) {
 	 */
 	exports.line = function pipeLine() {
 
-		var name, definition;
+		var src, dest;
 
-		if (arguments.length === 1) {
-			// arguments: [definition]
-			name       = '*';
-			definition = arguments[0];
-		} else {
-			name       = arguments[0];
-			definition = arguments[1];
+		if (_.isString(arguments[0])) {
+
+			// arguments = [src, dest]
+			src  = arguments[0];
+			dest = arguments[1] || src;
+
+			// dest must be an array
+			dest = _.isArray(dest) ? dest : [dest];
+
+			// set line.
+			this.lines[src] = dest;
+
+		} else if (_.isObject(arguments[0])) {
+			// arguments = [{ src: dest }]
+
+			_.each(arguments[0], function (dest, src) {
+				this.line(src, dest);
+			}, this);
+
 		}
-
-		// save the line to the lines object hash
-		this.lines[name] = {
-			fn     : lineFn.call(this, definition, name),
-			matcher: aux.wildcard(name),
-		};
-
 
 		return this;
 	};
-	// alias.
-	exports.pipeline = exports.line;
 
 	/**
 	 * [rmLine description]
