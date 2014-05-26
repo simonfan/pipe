@@ -14,6 +14,8 @@ define(function (require, exports, module) {
 	 * @return {[type]}              [description]
 	 */
 	exports.to = function pipeTo(destinations) {
+		this.clearCache();
+
 		destinations = _.isArray(destinations) ? destinations : [destinations];
 
 		this.destinations = destinations;
@@ -22,13 +24,21 @@ define(function (require, exports, module) {
 	};
 
 	/**
-	 * [addDestinations description]
+	 * [addDestination description]
 	 * @param {[type]} destinations [description]
 	 */
-	exports.addDestinations = function pipeAddDestination(destinations) {
+	exports.addDestination = function pipeAddDestination(destinations) {
+		this.clearCache();
 
+		// convert added destinations to array.
 		destinations = _.isArray(destinations) ? destinations : [destinations];
 
+		if (!this.destinations) {
+			// create a destinations object if none is set.
+			this.destinations = [];
+		}
+
+		// add new destinations to old ones.
 		this.destinations = this.destinations.concat(destinations);
 
 		return this;
@@ -36,14 +46,15 @@ define(function (require, exports, module) {
 	};
 
 	/**
-	 * [rmDestinations description]
+	 * [removeDestination description]
 	 * @param  {[type]} criteria [description]
 	 * @param  {[type]} context  [description]
 	 * @return {[type]}          [description]
 	 */
-	exports.rmDestinations = function pipeRmDestination(criteria, context) {
+	exports.removeDestination = function pipeRmDestination(criteria, context) {
+		this.clearCache();
 
-		this.destinations = _.remove(this.destinations, criteria, context);
+		_.remove(this.destinations, criteria, context);
 
 		return this;
 	};
@@ -56,10 +67,7 @@ define(function (require, exports, module) {
 	 */
 	exports.from = function pipeFrom(source) {
 		// restart cache
-		this.cache = {
-			src: {},
-			dest: {}
-		};
+		this.clearCache();
 
 		this.source = source;
 

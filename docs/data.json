@@ -4,22 +4,8 @@
         "version": "0.0.0"
     },
     "files": {
-        "src/__pipe/line/fn.js": {
-            "name": "src/__pipe/line/fn.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
-        "src/__pipe/line/index.js": {
-            "name": "src/__pipe/line/index.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
-        "src/__pipe/auxiliary.js": {
-            "name": "src/__pipe/auxiliary.js",
+        "src/__pipe/line.js": {
+            "name": "src/__pipe/line.js",
             "modules": {},
             "classes": {},
             "fors": {},
@@ -32,8 +18,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "src/__pipe/stream-control.js": {
-            "name": "src/__pipe/stream-control.js",
+        "src/__pipe/streams.js": {
+            "name": "src/__pipe/streams.js",
             "modules": {},
             "classes": {},
             "fors": {},
@@ -65,129 +51,8 @@
     "classes": {},
     "classitems": [
         {
-            "file": "src/__pipe/line/fn.js",
-            "line": 12,
-            "description": "Invokes a list of functions.",
-            "params": [
-                {
-                    "name": "fns",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/line/fn.js",
-            "line": 29,
-            "description": "Converts an array of line definitions and returns a function.",
-            "params": [
-                {
-                    "name": "subLines",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "lineName",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/line/fn.js",
-            "line": 50,
-            "description": "[functionLineFn description]",
-            "params": [
-                {
-                    "name": "func",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "lineName",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/line/fn.js",
-            "line": 79,
-            "description": "[0] full matched str\n[1] method\n[2] arguments\n\n[stringLineFnParse description]",
-            "params": [
-                {
-                    "name": "str",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/line/fn.js",
-            "line": 106,
-            "params": [
-                {
-                    "name": "stringLineStr",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "lineName",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/line/fn.js",
-            "line": 137,
-            "description": "Given an line of any format,\nreturns a function to be executed.",
-            "params": [
-                {
-                    "name": "line",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "lineName",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/line/index.js",
-            "line": 13,
+            "file": "src/__pipe/line.js",
+            "line": 10,
             "description": "[line description]",
             "params": [
                 {
@@ -208,29 +73,12 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/line/index.js",
-            "line": 45,
-            "description": "[rmLine description]",
+            "file": "src/__pipe/line.js",
+            "line": 44,
+            "description": "[removeLine description]",
             "params": [
                 {
                     "name": "name",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/auxiliary.js",
-            "line": 10,
-            "description": "Checks whether the name accepts wildcards.\nIf so, returns a regexp.\nOtherwise, return a string, for exact matching.",
-            "params": [
-                {
-                    "name": "str",
                     "description": "[description]",
                     "type": "[type]"
                 }
@@ -260,7 +108,42 @@
         },
         {
             "file": "src/__pipe/mapping.js",
-            "line": 28,
+            "line": 26,
+            "description": "[addDestination description]",
+            "params": [
+                {
+                    "name": "destinations",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/mapping.js",
+            "line": 48,
+            "description": "[removeDestination description]",
+            "params": [
+                {
+                    "name": "criteria",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "context",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/mapping.js",
+            "line": 62,
             "description": "Defines the source.",
             "params": [
                 {
@@ -276,29 +159,17 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/stream-control.js",
+            "file": "src/__pipe/streams.js",
             "line": 13,
-            "description": "Used for communication between methods defined in this module.\nEssentially for caching.",
-            "type": "{Object}",
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/stream-control.js",
-            "line": 23,
-            "description": "Runs a single pipe function with a single key.\nPasses only one argument, the value.",
+            "description": "runs action with lines.",
             "params": [
-                {
-                    "name": "source",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
                 {
                     "name": "fn",
                     "description": "[description]",
                     "type": "Function"
                 },
                 {
-                    "name": "key",
+                    "name": "lines",
                     "description": "[description]",
                     "type": "[type]"
                 }
@@ -310,36 +181,9 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/stream-control.js",
-            "line": 44,
-            "description": "Runs a single pipe function\nFor a wildcard key.\n\nThe difference is the this runner passes the\nkey as first argument.\n\n[execWildcardKeyPipe description]",
-            "params": [
-                {
-                    "name": "source",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "fn",
-                    "description": "[description]",
-                    "type": "Function"
-                },
-                {
-                    "name": "key",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/stream-control.js",
-            "line": 68,
-            "description": "Runs a single line\ntesting its matcher across all properties of the source object.\n\n[execPipeLine description]",
+            "file": "src/__pipe/streams.js",
+            "line": 45,
+            "description": "Runs a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
             "params": [
                 {
                     "name": "def",
@@ -354,8 +198,30 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/stream-control.js",
-            "line": 110,
+            "file": "src/__pipe/streams.js",
+            "line": 85,
+            "description": "[drainPipeline description]",
+            "params": [
+                {
+                    "name": "srcProp",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "destProps",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/streams.js",
+            "line": 102,
             "description": "[exports description]",
             "return": {
                 "description": "[description]",
@@ -364,9 +230,16 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/stream-control.js",
-            "line": 137,
-            "description": "Sets data onto source AND pushes.",
+            "file": "src/__pipe/streams.js",
+            "line": 108,
+            "description": "[drain description]",
+            "type": "{[type]}",
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/streams.js",
+            "line": 114,
+            "description": "Sets data onto source AND pumpes.",
             "params": [
                 {
                     "name": "data",
@@ -382,11 +255,11 @@
         },
         {
             "file": "src/index.js",
-            "line": 25,
+            "line": 27,
             "description": "[initialize description]",
             "params": [
                 {
-                    "name": "pipelines",
+                    "name": "mappings",
                     "description": "[description]",
                     "type": "[type]"
                 },
@@ -402,102 +275,60 @@
             },
             "class": "",
             "module": "pipe"
-        },
-        {
-            "file": "src/index.js",
-            "line": 58,
-            "description": "Checks if a property has uncached changes on the source",
-            "params": [
-                {
-                    "name": "prop",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": "",
-            "module": "pipe"
         }
     ],
     "warnings": [
         {
-            "message": "Missing item type\nInvokes a list of functions.",
-            "line": " src/__pipe/line/fn.js:12"
-        },
-        {
-            "message": "Missing item type\nConverts an array of line definitions and returns a function.",
-            "line": " src/__pipe/line/fn.js:29"
-        },
-        {
-            "message": "Missing item type\n[functionLineFn description]",
-            "line": " src/__pipe/line/fn.js:50"
-        },
-        {
-            "message": "Missing item type\n[0] full matched str\n[1] method\n[2] arguments\n\n[stringLineFnParse description]",
-            "line": " src/__pipe/line/fn.js:79"
-        },
-        {
-            "message": "Missing item type",
-            "line": " src/__pipe/line/fn.js:106"
-        },
-        {
-            "message": "Missing item type\nGiven an line of any format,\nreturns a function to be executed.",
-            "line": " src/__pipe/line/fn.js:137"
-        },
-        {
             "message": "Missing item type\n[line description]",
-            "line": " src/__pipe/line/index.js:13"
+            "line": " src/__pipe/line.js:10"
         },
         {
-            "message": "Missing item type\n[rmLine description]",
-            "line": " src/__pipe/line/index.js:45"
-        },
-        {
-            "message": "Missing item type\nChecks whether the name accepts wildcards.\nIf so, returns a regexp.\nOtherwise, return a string, for exact matching.",
-            "line": " src/__pipe/auxiliary.js:10"
+            "message": "Missing item type\n[removeLine description]",
+            "line": " src/__pipe/line.js:44"
         },
         {
             "message": "Missing item type\nDefines destination(s)",
             "line": " src/__pipe/mapping.js:10"
         },
         {
+            "message": "Missing item type\n[addDestination description]",
+            "line": " src/__pipe/mapping.js:26"
+        },
+        {
+            "message": "Missing item type\n[removeDestination description]",
+            "line": " src/__pipe/mapping.js:48"
+        },
+        {
             "message": "Missing item type\nDefines the source.",
-            "line": " src/__pipe/mapping.js:28"
+            "line": " src/__pipe/mapping.js:62"
         },
         {
-            "message": "Missing item type\nUsed for communication between methods defined in this module.\nEssentially for caching.",
-            "line": " src/__pipe/stream-control.js:13"
+            "message": "Missing item type\nruns action with lines.",
+            "line": " src/__pipe/streams.js:13"
         },
         {
-            "message": "Missing item type\nRuns a single pipe function with a single key.\nPasses only one argument, the value.",
-            "line": " src/__pipe/stream-control.js:23"
+            "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
+            "line": " src/__pipe/streams.js:45"
         },
         {
-            "message": "Missing item type\nRuns a single pipe function\nFor a wildcard key.\n\nThe difference is the this runner passes the\nkey as first argument.\n\n[execWildcardKeyPipe description]",
-            "line": " src/__pipe/stream-control.js:44"
-        },
-        {
-            "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the source object.\n\n[execPipeLine description]",
-            "line": " src/__pipe/stream-control.js:68"
+            "message": "Missing item type\n[drainPipeline description]",
+            "line": " src/__pipe/streams.js:85"
         },
         {
             "message": "Missing item type\n[exports description]",
-            "line": " src/__pipe/stream-control.js:110"
+            "line": " src/__pipe/streams.js:102"
         },
         {
-            "message": "Missing item type\nSets data onto source AND pushes.",
-            "line": " src/__pipe/stream-control.js:137"
+            "message": "Missing item type\n[drain description]",
+            "line": " src/__pipe/streams.js:108"
+        },
+        {
+            "message": "Missing item type\nSets data onto source AND pumpes.",
+            "line": " src/__pipe/streams.js:114"
         },
         {
             "message": "Missing item type\n[initialize description]",
-            "line": " src/index.js:25"
-        },
-        {
-            "message": "Missing item type\nChecks if a property has uncached changes on the source",
-            "line": " src/index.js:58"
+            "line": " src/index.js:27"
         }
     ]
 }

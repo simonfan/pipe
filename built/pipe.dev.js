@@ -14,6 +14,8 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 	 * @return {[type]}              [description]
 	 */
 	exports.to = function pipeTo(destinations) {
+		this.clearCache();
+
 		destinations = _.isArray(destinations) ? destinations : [destinations];
 
 		this.destinations = destinations;
@@ -21,8 +23,40 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 		return this;
 	};
 
-	exports.rmDestination = function pipeRmDestination(name) {
+	/**
+	 * [addDestination description]
+	 * @param {[type]} destinations [description]
+	 */
+	exports.addDestination = function pipeAddDestination(destinations) {
+		this.clearCache();
 
+		// convert added destinations to array.
+		destinations = _.isArray(destinations) ? destinations : [destinations];
+
+		if (!this.destinations) {
+			// create a destinations object if none is set.
+			this.destinations = [];
+		}
+
+		// add new destinations to old ones.
+		this.destinations = this.destinations.concat(destinations);
+
+		return this;
+
+	};
+
+	/**
+	 * [removeDestination description]
+	 * @param  {[type]} criteria [description]
+	 * @param  {[type]} context  [description]
+	 * @return {[type]}          [description]
+	 */
+	exports.removeDestination = function pipeRmDestination(criteria, context) {
+		this.clearCache();
+
+		_.remove(this.destinations, criteria, context);
+
+		return this;
 	};
 
 	/**
@@ -33,7 +67,7 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 	 */
 	exports.from = function pipeFrom(source) {
 		// restart cache
-		this.cache = {};
+		this.clearCache();
 
 		this.source = source;
 
@@ -46,7 +80,7 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 
 /* jshint ignore:end */
 
-define('__pipe/stream-control',['require','exports','module','lodash','q'],function (require, exports, module) {
+define('__pipe/streams',['require','exports','module','lodash','q'],function (require, exports, module) {
 	
 
 
@@ -55,107 +89,13 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 
 
 	/**
-	 * Used for communication between methods defined in this module.
-	 * Essentially for caching.
+	 * runs action with lines.
 	 *
-	 * @type {Object}
+	 * @param  {Function} fn    [description]
+	 * @param  {[type]}   lines [description]
+	 * @return {[type]}         [description]
 	 */
-	var __closure = {
-		cacheTmp: {}
-	};
-
-	/**
-	 * Runs a single pipe function with a single key.
-	 * Passes only one argument, the value.
-	 *
-	 * @param  {[type]}   source [description]
-	 * @param  {Function} fn     [description]
-	 * @param  {[type]}   key    [description]
-	 * @return {[type]}          [description]
-	 */
-	function execExactKeyPipe(source, fn, key) {
-		// get value
-		var value = source[key];
-
-		// set value to cache
-		// ONLY WHEN ALL PIPES HAVE BEEN RUN.
-		__closure.cacheTmp[key] = value;
-
-		return fn(value);
-	}
-
-
-	/**
-	 * Runs a single pipe function
-	 * For a wildcard key.
-	 *
-	 * The difference is the this runner passes the
-	 * key as first argument.
-	 *
-	 * [execWildcardKeyPipe description]
-	 * @param  {[type]}   source [description]
-	 * @param  {Function} fn     [description]
-	 * @param  {[type]}   key    [description]
-	 * @return {[type]}          [description]
-	 */
-	function execWildcardKeyPipe(source, fn, key) {
-		// get value
-		var value = source[key];
-
-		// set value to cache
-		// ONLY WHEN ALL PIPES HAVE BEEN RUN.
-		__closure.cacheTmp[key] = value;
-
-		return fn(key, value);
-	}
-
-	/**
-	 * Runs a single line
-	 * testing its matcher across all properties of the source object.
-	 *
-	 * [execPipeLine description]
-	 * @param  {[type]} def [description]
-	 * @return {Promise}     [description]
-	 */
-	function execPipeLine(def, name) {
-
-		var source  = this.source,
-			matcher = def.matcher,
-			fn      = def.fn,
-			res     = [];
-
-		if (_.isString(matcher) && this.changed(matcher)) {
-			// exact key
-
-			res.push(execExactKeyPipe(source, fn, matcher));
-
-		} else if (_.isRegExp(matcher)) {
-			// wildcard key
-
-			// loop through source object ALL properties
-			// (including inherited)
-			for (var key in source) {
-
-				// exec pipe for keys that match the matcher
-				if (matcher.test(key) && this.changed(key)) {
-					res.push(execWildcardKeyPipe(source, fn, key))
-				}
-
-			}
-		}
-
-		return res.length === 1 ? res[0] : q.all(res);
-	}
-
-
-
-
-
-	/**
-	 * [exports description]
-	 * @return {[type]} [description]
-	 */
-	exports.push = function push(lines) {
+	function streamPipeline(streamFn, lines) {
 
 		var defer = q.defer();
 
@@ -163,12 +103,12 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 		// defaults to ALL
 		lines = lines ? _.pick(this.lines, lines) : this.lines;
 
-		// execute pipelines
-		var results = _.map(lines, execPipeLine, this);
+		var results = _.map(lines, function (destProps, srcProp) {
 
-		// update cache
-		_.assign(this.cache, __closure.cacheTmp);
-		__closure.cacheTmp = {};
+			// run the action
+			streamFn.call(this, srcProp, destProps);
+
+		}, this);
 
 		q.all(results).done(function () {
 			// resolve with no arguments.
@@ -176,19 +116,103 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 		});
 
 		return defer.promise;
-	};
+	}
+
+
 
 	/**
-	 * Sets data onto source AND pushes.
+	 * Runs a single line
+	 * testing its matcher across all properties of the source object.
+	 *
+	 * [pumpPipe description]
+	 * @param  {[type]} def [description]
+	 * @return {Promise}     [description]
+	 */
+	function pumpPipeline(srcProp, destProps) {
+
+		var value = this._srcGet(this.source, srcProp);
+
+		if (value !== this.cache.src[srcProp]) {
+			// if value is different from the one in cache
+			// do setting
+
+			var res = _.map(destProps, function (prop) {
+
+				// set on all destinations
+				var setPropRes = _.map(this.destinations, function (destination) {
+
+					// set on single destination
+					return this._destSet(destination, prop, value);
+				}, this);
+
+				q.all(setPropRes);
+
+			}, this);
+
+
+			// set value to cache
+			// ONLY WHEN ALL PIPES HAVE BEEN RUN.
+			this.cache.src[srcProp] = value;
+
+			return q.all(res)
+		}
+	}
+
+
+
+	/**
+	 * [drainPipeline description]
+	 * @param  {[type]} srcProp   [description]
+	 * @param  {[type]} destProps [description]
+	 * @return {[type]}           [description]
+	 */
+	function drainPipeline(srcProp, destProps) {
+
+		var value = this._destGet(this.destinations[0], destProps[0]);
+
+			// check cache
+		if (value !== this.cache.dest[destProps]) {
+			return this._srcSet(this.source, srcProp, value);
+		}
+	}
+
+
+	/**
+	 * [exports description]
+	 * @return {[type]} [description]
+	 */
+	exports.pump = _.partial(streamPipeline, pumpPipeline);
+
+	/**
+	 * [drain description]
+	 * @type {[type]}
+	 */
+	exports.drain = _.partial(streamPipeline, drainPipeline);
+
+	/**
+	 * Sets data onto source AND pumpes.
 	 *
 	 * @param  {[type]} data [description]
 	 * @return {[type]}      [description]
 	 */
 	exports.inject = function inject(data) {
 
-		_.assign(this.source, data);
+		if (!this.source) {
+			throw new Error('No source for pipe');
+		}
 
-		return this.push();
+		var setRes = _.map(data, function (value, key) {
+
+			return this._srcSet(this.source, key, value);
+
+		}, this);
+
+		return q.all(setRes)
+				.then(_.bind(function () {
+					return this.pump();
+				}, this), function (e) {
+					throw e;
+				});
 	};
 });
 
@@ -196,213 +220,10 @@ define('__pipe/stream-control',['require','exports','module','lodash','q'],funct
 
 /* jshint ignore:end */
 
-define('__pipe/auxiliary',['require','exports','module'],function (require, exports, module) {
+define('__pipe/line',['require','exports','module','lodash'],function (require, exports, module) {
 	
 
-	var wildcardMatcher = /\*/g;
-
-	/**
-	 * Checks whether the name accepts wildcards.
-	 * If so, returns a regexp.
-	 * Otherwise, return a string, for exact matching.
-	 *
-	 * @param  {[type]} str [description]
-	 * @return {[type]}            [description]
-	 */
-	exports.wildcard = function wildcard(str) {
-
-		var matcher;
-
-		if (str.match(wildcardMatcher)) {
-			// wildcard
-
-			matcher = str.replace(wildcardMatcher, '.*');
-			matcher = new RegExp(matcher);
-
-		} else {
-			// not wildcard
-			matcher = str;
-		}
-
-		return matcher;
-	};
-
-
-});
-
-/* jshint ignore:start */
-
-/* jshint ignore:end */
-
-define('__pipe/line/fn',['require','exports','module','lodash','q'],function (require, exports, module) {
-	
-
-
-	var _ = require('lodash'),
-		q = require('q');
-
-	/**
-	 * Invokes a list of functions.
-	 * @param  {[type]} fns   [description]
-	 * @return {[type]}       [description]
-	 */
-	function invokeFns(fns) {
-
-		var args = Array.prototype.slice.call(arguments, 1);
-
-		var results = _.map(fns, function (fn) {
-			return fn.apply(this, args);
-		});
-
-		// return promise
-		return q.all(results);
-	}
-
-	/**
-	 * Converts an array of line definitions and returns a function.
-	 *
-	 * @param  {[type]} subLines [description]
-	 * @param  {[type]} lineName [description]
-	 * @return {[type]}            [description]
-	 */
-	function arrayLineFn(subLines, lineName) {
-
-		var fns = _.map(subLines, function (line, index) {
-			// invoke build line
-			return lineFn.call(this, line, lineName);
-
-		}, this);
-
-		// return a function that executes all subLines in order
-		return _.partial(invokeFns, fns);
-	}
-
-
-
-	/**
-	 * [functionLineFn description]
-	 * @param  {[type]} func     [description]
-	 * @param  {[type]} lineName [description]
-	 * @return {[type]}          [description]
-	 */
-	function functionLineFn(func, lineName) {
-		return _.bind(function pipeFnLine() {
-
-			// get invocation arguments
-			var args = _.toArray(arguments);
-
-			// invoke
-			var results = _.map(this.destinations, function (destination) {
-
-				// invoke the fn with destination as first argument.
-				var lineArgs = [destination].concat(args);
-				return func.apply(this, lineArgs);
-
-			}, this);
-
-			// return promise, as always.
-			return q.all(results);
-
-		}, this);
-	}
-
-
-
-	/**
-	 * [0] full matched str
-	 * [1] method
-	 * [2] arguments
-	 *
-	 * [stringLineFnParse description]
-	 * @param  {[type]} str [description]
-	 * @return {[type]}     [description]
-	 */
-	var lineMatcher = /^\s*([^:]*)(?::(.*))?$/,
-		argsSplit   = /\s*,\s*/g;
-
-	function stringLineFnParse(str) {
-
-		var match = str.match(lineMatcher);
-
-		if (!match) {
-			throw new Error('Invalid line definition for jquery-pipe.');
-		}
-
-		return {
-			method: match[1],
-			args  : match[2] ? match[2].split(argsSplit) : []
-		};
-	}
-
-
-	/**
-	 *
-	 * @param  {[type]} stringLineStr     [description]
-	 * @param  {[type]} lineName [description]
-	 * @return {[type]}            [description]
-	 */
-	function stringLineFn(stringLineStr, lineName) {
-
-		var parsed = stringLineFnParse(stringLineStr);
-
-		// [1] check if there is a method on the destination
-		//     corresponding to the line defined
-		return _.bind(function pipeInvokeMethodsOnDestinations() {
-
-			// get invocation arguments
-			var args = parsed.args.concat(_.toArray(arguments));
-
-			// invoke methods on destinations.
-			var results = _.map(this.destinations, function (destination) {
-				// invoke method on the destination
-				return destination[parsed.method].apply(destination, args);
-			});
-
-			// return promise, as always.
-			return q.all(results);
-
-		}, this);
-	}
-
-
-
-	/**
-	 * Given an line of any format,
-	 * returns a function to be executed.
-	 *
-	 * @param  {[type]} line     [description]
-	 * @param  {[type]} lineName [description]
-	 * @return {[type]}            [description]
-	 */
-	function lineFn(line, lineName) {
-		if (_.isString(line)) {
-			// invoke destination method.
-			return stringLineFn.call(this, line, lineName);
-
-		} else if (_.isArray(line)) {
-			// multiple lines
-			return arrayLineFn.call(this, line, lineName);
-
-		} else if (_.isFunction(line)) {
-			return line;
-		}
-	}
-
-
-	module.exports = lineFn;
-});
-
-/* jshint ignore:start */
-
-/* jshint ignore:end */
-
-define('__pipe/line/index',['require','exports','module','../auxiliary','./fn'],function (require, exports, module) {
-	
-
-	var aux    = require('../auxiliary'),
-		// the fn parser
-		lineFn = require('./fn');
-
+	var _ = require('lodash');
 
 	/**
 	 * [line description]
@@ -412,36 +233,38 @@ define('__pipe/line/index',['require','exports','module','../auxiliary','./fn'],
 	 */
 	exports.line = function pipeLine() {
 
-		var name, definition;
+		var src, dest;
 
-		if (arguments.length === 1) {
-			// arguments: [definition]
-			name       = '*';
-			definition = arguments[0];
-		} else {
-			// arguments: [name, definition, pull]
-			name       = arguments[0];
-			definition = arguments[1];
+		if (_.isString(arguments[0])) {
+
+			// arguments = [src, dest]
+			src  = arguments[0];
+			dest = arguments[1] || src;
+
+			// dest must be an array
+			dest = _.isArray(dest) ? dest : [dest];
+
+			// set line.
+			this.lines[src] = dest;
+
+		} else if (_.isObject(arguments[0])) {
+			// arguments = [{ src: dest }]
+
+			_.each(arguments[0], function (dest, src) {
+				this.line(src, dest);
+			}, this);
+
 		}
-
-		// save the line to the lines object hash
-		this.lines[name] = {
-			fn     : lineFn.call(this, definition, name),
-			matcher: aux.wildcard(name),
-		};
-
 
 		return this;
 	};
-	// alias.
-	exports.pipeline = exports.line;
 
 	/**
-	 * [rmLine description]
+	 * [removeLine description]
 	 * @param  {[type]} name [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.rmLine = function rmPipeLine(name) {
+	exports.removeLine = function rmPipeLine(name) {
 		delete this.lines[name];
 
 		return this;
@@ -462,27 +285,45 @@ define('__pipe/line/index',['require','exports','module','../auxiliary','./fn'],
 
 /* jshint ignore:end */
 
-define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping','./__pipe/stream-control','./__pipe/line/index'],function (require, exports, module) {
+define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping','./__pipe/streams','./__pipe/line'],function (require, exports, module) {
 	
 
 	var subject = require('subject'),
 		_       = require('lodash');
 
 
+	var extensionOptionNames = ['srcGet', 'srcSet', 'destGet', 'destSet'];
+
 	var pipe = module.exports = subject({
 
 
 		/**
 		 * [initialize description]
-		 * @param  {[type]} pipelines [description]
+		 * @param  {[type]} mappings [description]
 		 * @param  {[type]} options   [description]
 		 * @return {[type]}           [description]
 		 */
-		initialize: function initialize(pipelines, options) {
+		initialize: function initialize(lines, options) {
 
 			options = options || {};
 
-			this.source = {};
+			// some default options
+			_.each(extensionOptionNames, function (opt) {
+				this[opt] = options[opt] || this[opt];
+			}, this);
+
+			// _*get and _*set methods.
+			this._srcGet = this.srcGet || this.get;
+			this._srcSet = this.srcSet || this.set;
+			this._destGet = this.destGet || this.get;
+			this._destSet = this.destSet || this.set;
+
+			// the cache. if set to false, no cache will be used.
+			this.cache = options.cache === false ? false : {
+				src: {},
+				dest: {},
+			};
+
 			if (options.source) {
 				this.from(source);
 			}
@@ -491,34 +332,44 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 				this.to(options.destination);
 			}
 
-			// the cache. if set to false, no cache will be used.
-			this.cache = options.cache === false ? false : {};
-
-			// object on which pipelines will be stored.
+			// object on which line mappings will be stored.
 			this.lines = {};
-			// build pipelines
-			_.each(pipelines, function (pipeline, name) {
-
-				this.line(name, pipeline);
-
-			}, this);
+			this.line(lines);
 		},
 
+		get: function pipeGet(object, property) {
+			return object[property];
+		},
 
-		/**
-		 * Checks if a property has uncached changes on the source
-		 *
-		 * @param  {[type]} prop [description]
-		 * @return {[type]}      [description]
-		 */
-		changed: function changed(prop) {
-			return this.source[prop] !== this.cache[prop];
+		set: function pipeSet(object, property, value) {
+			object[property] = value;
+
+			return object;
+		},
+
+/*
+
+	exports.srcGet
+	exports.srcSet
+
+	exports.destGet
+	exports.destSet
+*/
+
+
+		clearCache: function clearCache() {
+			this.cache = {
+				src: {},
+				dest: {},
+			};
+
+			return this;
 		},
 	});
 
 	// prototype
 	pipe.assignProto(require('./__pipe/mapping'))
-		.assignProto(require('./__pipe/stream-control'))
-		.assignProto(require('./__pipe/line/index'));
+		.assignProto(require('./__pipe/streams'))
+		.assignProto(require('./__pipe/line'));
 });
 

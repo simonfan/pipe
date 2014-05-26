@@ -107,20 +107,38 @@ define(function (require, exports, module) {
 		_       = require(&#x27;lodash&#x27;);
 
 
+	var extensionOptionNames = [&#x27;srcGet&#x27;, &#x27;srcSet&#x27;, &#x27;destGet&#x27;, &#x27;destSet&#x27;];
+
 	var pipe = module.exports = subject({
 
 
 		/**
 		 * [initialize description]
-		 * @param  {[type]} pipelines [description]
+		 * @param  {[type]} mappings [description]
 		 * @param  {[type]} options   [description]
 		 * @return {[type]}           [description]
 		 */
-		initialize: function initialize(pipelines, options) {
+		initialize: function initialize(lines, options) {
 
 			options = options || {};
 
-			this.source = {};
+			// some default options
+			_.each(extensionOptionNames, function (opt) {
+				this[opt] = options[opt] || this[opt];
+			}, this);
+
+			// _*get and _*set methods.
+			this._srcGet = this.srcGet || this.get;
+			this._srcSet = this.srcSet || this.set;
+			this._destGet = this.destGet || this.get;
+			this._destSet = this.destSet || this.set;
+
+			// the cache. if set to false, no cache will be used.
+			this.cache = options.cache === false ? false : {
+				src: {},
+				dest: {},
+			};
+
 			if (options.source) {
 				this.from(source);
 			}
@@ -129,35 +147,45 @@ define(function (require, exports, module) {
 				this.to(options.destination);
 			}
 
-			// the cache. if set to false, no cache will be used.
-			this.cache = options.cache === false ? false : {};
-
-			// object on which pipelines will be stored.
+			// object on which line mappings will be stored.
 			this.lines = {};
-			// build pipelines
-			_.each(pipelines, function (pipeline, name) {
-
-				this.line(name, pipeline);
-
-			}, this);
+			this.line(lines);
 		},
 
+		get: function pipeGet(object, property) {
+			return object[property];
+		},
 
-		/**
-		 * Checks if a property has uncached changes on the source
-		 *
-		 * @param  {[type]} prop [description]
-		 * @return {[type]}      [description]
-		 */
-		changed: function changed(prop) {
-			return this.source[prop] !== this.cache[prop];
+		set: function pipeSet(object, property, value) {
+			object[property] = value;
+
+			return object;
+		},
+
+/*
+
+	exports.srcGet
+	exports.srcSet
+
+	exports.destGet
+	exports.destSet
+*/
+
+
+		clearCache: function clearCache() {
+			this.cache = {
+				src: {},
+				dest: {},
+			};
+
+			return this;
 		},
 	});
 
 	// prototype
 	pipe.assignProto(require(&#x27;./__pipe/mapping&#x27;))
-		.assignProto(require(&#x27;./__pipe/stream-control&#x27;))
-		.assignProto(require(&#x27;./__pipe/line/index&#x27;));
+		.assignProto(require(&#x27;./__pipe/streams&#x27;))
+		.assignProto(require(&#x27;./__pipe/line&#x27;));
 });
 
     </pre>

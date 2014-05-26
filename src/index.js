@@ -19,6 +19,8 @@ define(function (require, exports, module) {
 		_       = require('lodash');
 
 
+	var extensionOptionNames = ['srcGet', 'srcSet', 'destGet', 'destSet'];
+
 	var pipe = module.exports = subject({
 
 
@@ -31,6 +33,17 @@ define(function (require, exports, module) {
 		initialize: function initialize(lines, options) {
 
 			options = options || {};
+
+			// some default options
+			_.each(extensionOptionNames, function (opt) {
+				this[opt] = options[opt] || this[opt];
+			}, this);
+
+			// _*get and _*set methods.
+			this._srcGet = this.srcGet || this.get;
+			this._srcSet = this.srcSet || this.set;
+			this._destGet = this.destGet || this.get;
+			this._destSet = this.destSet || this.set;
 
 			// the cache. if set to false, no cache will be used.
 			this.cache = options.cache === false ? false : {
@@ -70,6 +83,15 @@ define(function (require, exports, module) {
 	exports.destSet
 */
 
+
+		clearCache: function clearCache() {
+			this.cache = {
+				src: {},
+				dest: {},
+			};
+
+			return this;
+		},
 	});
 
 	// prototype

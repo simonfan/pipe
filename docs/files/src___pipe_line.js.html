@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/__pipe/line/index.js - pipe</title>
+    <title>src/__pipe/line.js - pipe</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -82,7 +82,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/__pipe/line/index.js</h1>
+                        <h1 class="file-heading">File: src/__pipe/line.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -93,10 +93,7 @@ if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefin
 define(function (require, exports, module) {
 	&#x27;use strict&#x27;;
 
-	var aux    = require(&#x27;../auxiliary&#x27;),
-		// the fn parser
-		lineFn = require(&#x27;./fn&#x27;);
-
+	var _ = require(&#x27;lodash&#x27;);
 
 	/**
 	 * [line description]
@@ -106,36 +103,38 @@ define(function (require, exports, module) {
 	 */
 	exports.line = function pipeLine() {
 
-		var name, definition;
+		var src, dest;
 
-		if (arguments.length === 1) {
-			// arguments: [definition]
-			name       = &#x27;*&#x27;;
-			definition = arguments[0];
-		} else {
-			// arguments: [name, definition, pull]
-			name       = arguments[0];
-			definition = arguments[1];
+		if (_.isString(arguments[0])) {
+
+			// arguments = [src, dest]
+			src  = arguments[0];
+			dest = arguments[1] || src;
+
+			// dest must be an array
+			dest = _.isArray(dest) ? dest : [dest];
+
+			// set line.
+			this.lines[src] = dest;
+
+		} else if (_.isObject(arguments[0])) {
+			// arguments = [{ src: dest }]
+
+			_.each(arguments[0], function (dest, src) {
+				this.line(src, dest);
+			}, this);
+
 		}
-
-		// save the line to the lines object hash
-		this.lines[name] = {
-			fn     : lineFn.call(this, definition, name),
-			matcher: aux.wildcard(name),
-		};
-
 
 		return this;
 	};
-	// alias.
-	exports.pipeline = exports.line;
 
 	/**
-	 * [rmLine description]
+	 * [removeLine description]
 	 * @param  {[type]} name [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.rmLine = function rmPipeLine(name) {
+	exports.removeLine = function rmPipeLine(name) {
 		delete this.lines[name];
 
 		return this;

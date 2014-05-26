@@ -38,9 +38,6 @@
 					var method = key.split(':')[0],
 						arg    = key.split(':')[1];
 
-					console.log(method);
-					console.log(arg);
-
 					object[method](arg, value);
 				},
 			})

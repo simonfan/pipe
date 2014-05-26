@@ -19,13 +19,12 @@
 })('test', function(Pipe, should) {
 	'use strict';
 
-	describe('Pipe stream-control', function () {
-
-		it('inject()', function () {
-
+	describe('Pipe stream-inject', function () {
+		beforeEach(function (done) {
+			done();
 		});
 
-		it('push()', function () {
+		it('is fine (:', function () {
 			var fruit = { name: 'banana' }
 			fruit.should.have.property('name', 'banana');
 		});

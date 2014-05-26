@@ -42,11 +42,11 @@ define(function (require, exports, module) {
 	};
 
 	/**
-	 * [rmLine description]
+	 * [removeLine description]
 	 * @param  {[type]} name [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.rmLine = function rmPipeLine(name) {
+	exports.removeLine = function rmPipeLine(name) {
 		delete this.lines[name];
 
 		return this;

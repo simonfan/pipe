@@ -10,8 +10,6 @@ define(function (require, exports, module) {
 		q = require('q');
 
 
-
-
 	/**
 	 * runs action with lines.
 	 *
@@ -21,12 +19,14 @@ define(function (require, exports, module) {
 	 */
 	function streamPipeline(streamFn, lines) {
 
+		// [1] create a deferred object.
 		var defer = q.defer();
 
-		// pick the lines to be executed.
-		// defaults to ALL
+		// [2] pick the lines to be executed.
+		//     defaults to ALL
 		lines = lines ? _.pick(this.lines, lines) : this.lines;
 
+		// [3] call the streamFn for all lines.
 		var results = _.map(lines, function (destProps, srcProp) {
 
 			// run the action
@@ -34,15 +34,16 @@ define(function (require, exports, module) {
 
 		}, this);
 
+		// [4] resolve the deferred object with NO VALUES
+		//     when all the streamFn invocations have been completed.
 		q.all(results).done(function () {
 			// resolve with no arguments.
 			defer.resolve();
 		});
 
+		// [5] return the promise.
 		return defer.promise;
 	}
-
-
 
 	/**
 	 * Runs a single line
@@ -54,32 +55,40 @@ define(function (require, exports, module) {
 	 */
 	function pumpPipeline(srcProp, destProps) {
 
-		var get = this.srcGet || this.get,
-			set = this.destSet || this.set;
+		// [1] GET value from SOURCE
+		var value = this._srcGet(this.source, srcProp);
 
-		var value = get.call(this, this.source, srcProp);
-
+		// [2] check if cached value is the same as
+		//     current value
 		if (value !== this.cache.src[srcProp]) {
 			// if value is different from the one in cache
 			// do setting
 
+			// [2.1] set destination properties
 			var res = _.map(destProps, function (prop) {
 
-				var setPropRes = _.map(this.destinations, function (destination) {
-					return set.call(this, destination, prop, value);
+				// [2.1.1] set on all destinations
+				var destSetRes = _.map(this.destinations, function (destination) {
+
+					// [2.1.1.1] SET value onto DESTINATION
+					return this._destSet(destination, prop, value);
 				}, this);
 
-				q.all(setPropRes);
+				// [2.1.2] return a promise for
+				//         when all destination-settings are done.
+				return q.all(destSetRes);
 
 			}, this);
 
 
-			// set value to cache
-			// ONLY WHEN ALL PIPES HAVE BEEN RUN.
+			// [3] set value to cache
 			this.cache.src[srcProp] = value;
 
-			return q.all(res)
+			// [4] return a promise for when all property-settings are done.
+			return q.all(res);
 		}
+
+		// else: return undefined.
 	}
 
 
@@ -92,15 +101,17 @@ define(function (require, exports, module) {
 	 */
 	function drainPipeline(srcProp, destProps) {
 
-		var get = this.destGet || this.get,
-			set = this.srcSet || this.set;
+		// [1] GET value from the first DESTINATION (destinations[0])
+		var value = this._destGet(this.destinations[0], destProps[0]);
 
-		var value = get.call(this, this.destinations[0], destProps[0]);
-
-			// check cache
+		// [2] check cache
 		if (value !== this.cache.dest[destProps]) {
-			return set.call(this, source, prop, value);
+
+			// [2.1] SET value onto SOURCE
+			return this._srcSet(this.source, srcProp, value);
 		}
+
+		// else: return undefined
 	}
 
 
@@ -124,24 +135,29 @@ define(function (require, exports, module) {
 	 */
 	exports.inject = function inject(data) {
 
-		var set    = this.srcSet || this.set,
-			source = this.source;
-
-		if (!source) {
+		// [0] throw error if there is no source in the pipe object.
+		if (!this.source) {
 			throw new Error('No source for pipe');
 		}
 
-		var setRes = _.map(data, function (value, key) {
+		// [1] SET all data onto the SOURCE
+		var srcSetRes = _.map(data, function (value, key) {
 
-			return set.call(this, source, key, value);
+			return this._srcSet(this.source, key, value);
 
 		}, this);
 
-		return q.all(setRes)
-				.then(_.bind(function () {
-					return this.pump();
-				}, this), function (e) {
-					throw e;
-				});
+
+		// [2] wait for all srcSets
+		return q.all(srcSetRes).then(
+
+			// [2.1] then invoke pump on success
+			//       wrap in a method in order to guarantee
+			//       pump is invoked with NO ARGUMENTS
+			_.bind(function() { this.pump(); }, this),
+
+			// [2.2] or throw error
+			function (e) { throw e; }
+		);
 	};
 });
