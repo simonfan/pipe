@@ -255,10 +255,10 @@
         {
             "file": "src/__pipe/mapping.js",
             "line": 10,
-            "description": "Defines destination(s)",
+            "description": "Defines destination",
             "params": [
                 {
-                    "name": "destinations",
+                    "name": "destination",
                     "description": "[description]",
                     "type": "[type]"
                 }
@@ -272,41 +272,6 @@
         {
             "file": "src/__pipe/mapping.js",
             "line": 26,
-            "description": "[addDestination description]",
-            "params": [
-                {
-                    "name": "destinations",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/mapping.js",
-            "line": 48,
-            "description": "[removeDestination description]",
-            "params": [
-                {
-                    "name": "criteria",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "context",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/mapping.js",
-            "line": 62,
             "description": "Defines the source.",
             "params": [
                 {
@@ -387,20 +352,12 @@
             "line": " src/__pipe/line.js:44"
         },
         {
-            "message": "Missing item type\nDefines destination(s)",
+            "message": "Missing item type\nDefines destination",
             "line": " src/__pipe/mapping.js:10"
         },
         {
-            "message": "Missing item type\n[addDestination description]",
-            "line": " src/__pipe/mapping.js:26"
-        },
-        {
-            "message": "Missing item type\n[removeDestination description]",
-            "line": " src/__pipe/mapping.js:48"
-        },
-        {
             "message": "Missing item type\nDefines the source.",
-            "line": " src/__pipe/mapping.js:62"
+            "line": " src/__pipe/mapping.js:26"
         },
         {
             "message": "Missing item type\n[initialize description]",
