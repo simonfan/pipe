@@ -401,7 +401,7 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 			};
 
 			if (options.source) {
-				this.from(source);
+				this.from(options.source);
 			}
 
 			if (options.destination) {

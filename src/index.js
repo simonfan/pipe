@@ -52,7 +52,7 @@ define(function (require, exports, module) {
 			};
 
 			if (options.source) {
-				this.from(source);
+				this.from(options.source);
 			}
 
 			if (options.destination) {
