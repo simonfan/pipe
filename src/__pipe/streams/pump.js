@@ -61,7 +61,7 @@ define(function (require, exports, module) {
 	module.exports = function pump(srcProp, destProps) {
 
 
-		var destinations = this.destinations;
+		var destination = this.destination;
 
 		// [1] GET value from SOURCE
 		return q(this._srcGet(this.source, srcProp))
@@ -76,8 +76,8 @@ define(function (require, exports, module) {
 					this.cache.src[srcProp] = value;
 
 					// [3] resolve pumpDefer agter
-					//     value has been pumped to destinations
-					return pumpValueToDestinations.call(this, value, destinations, destProps)
+					//     value has been pumped to destination
+					return pumpValueToDestination.call(this, value, destination, destProps)
 
 
 				}// else return nothing, solve immediately

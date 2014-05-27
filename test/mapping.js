@@ -19,7 +19,7 @@
 })('test', function(pipe, should) {
 	'use strict';
 
-	describe('pipe mapping', function () {
+	describe.skip('pipe mapping', function () {
 
 		it('pipe.from(source)', function (testdone) {
 

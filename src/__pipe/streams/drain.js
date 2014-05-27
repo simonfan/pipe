@@ -18,7 +18,7 @@ define(function (require, exports, module) {
 	module.exports = function drainPipeline(srcProp, destProps) {
 
 		// [1] GET value from the first DESTINATION (destinations[0])
-		return q(this._destGet(this.destinations[0], destProps[0]))
+		return q(this._destGet(this.destination, destProps[0]))
 			.then(_.bind(function (value) {
 				// [2] check cache
 				if (value !== this.cache.dest[destProps]) {

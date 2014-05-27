@@ -8,56 +8,20 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 	var _ = require('lodash');
 
 	/**
-	 * Defines destination(s)
+	 * Defines destination
 	 *
-	 * @param  {[type]} destinations [description]
-	 * @return {[type]}              [description]
+	 * @param  {[type]} destination [description]
+	 * @return {[type]}             [description]
 	 */
-	exports.to = function pipeTo(destinations) {
+	exports.to = function pipeTo(destination) {
 		this.clearCache();
 
-		destinations = _.isArray(destinations) ? destinations : [destinations];
-
-		this.destinations = destinations;
+		this.destination = destination;
 
 		return this;
 	};
 
-	/**
-	 * [addDestination description]
-	 * @param {[type]} destinations [description]
-	 */
-	exports.addDestination = function pipeAddDestination(destinations) {
-		this.clearCache();
 
-		// convert added destinations to array.
-		destinations = _.isArray(destinations) ? destinations : [destinations];
-
-		if (!this.destinations) {
-			// create a destinations object if none is set.
-			this.destinations = [];
-		}
-
-		// add new destinations to old ones.
-		this.destinations = this.destinations.concat(destinations);
-
-		return this;
-
-	};
-
-	/**
-	 * [removeDestination description]
-	 * @param  {[type]} criteria [description]
-	 * @param  {[type]} context  [description]
-	 * @return {[type]}          [description]
-	 */
-	exports.removeDestination = function pipeRmDestination(criteria, context) {
-		this.clearCache();
-
-		_.remove(this.destinations, criteria, context);
-
-		return this;
-	};
 
 	/**
 	 * Defines the source.
@@ -139,7 +103,7 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 	module.exports = function pump(srcProp, destProps) {
 
 
-		var destinations = this.destinations;
+		var destination = this.destination;
 
 		// [1] GET value from SOURCE
 		return q(this._srcGet(this.source, srcProp))
@@ -154,8 +118,8 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 					this.cache.src[srcProp] = value;
 
 					// [3] resolve pumpDefer agter
-					//     value has been pumped to destinations
-					return pumpValueToDestinations.call(this, value, destinations, destProps)
+					//     value has been pumped to destination
+					return pumpValueToDestination.call(this, value, destination, destProps)
 
 
 				}// else return nothing, solve immediately
@@ -185,7 +149,7 @@ define('__pipe/streams/drain',['require','exports','module','lodash','q'],functi
 	module.exports = function drainPipeline(srcProp, destProps) {
 
 		// [1] GET value from the first DESTINATION (destinations[0])
-		return q(this._destGet(this.destinations[0], destProps[0]))
+		return q(this._destGet(this.destination, destProps[0]))
 			.then(_.bind(function (value) {
 				// [2] check cache
 				if (value !== this.cache.dest[destProps]) {
