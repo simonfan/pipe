@@ -18,7 +18,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]} properties  [description]
 	 * @return {[type]}             [description]
 	 */
-	function pumpValueToDestination(value, destination, properties) {
+	function pumpValue(value, destination, properties) {
 
 
 		var res = _.map(properties, function (prop) {
@@ -39,7 +39,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]} def [description]
 	 * @return {Promise}     [description]
 	 */
-	module.exports = function pump(srcProp, destProps, force) {
+	module.exports = function pumpPipeline(srcProp, destProps, force) {
 
 
 		var destination = this.destination;
@@ -55,7 +55,7 @@ define(function (require, exports, module) {
 
 					// [3] resolve pumpDefer agter
 					//     value has been pumped to destination
-					return pumpValueToDestination.call(this, value, destination, destProps)
+					return pumpValue.call(this, value, destination, destProps)
 
 				}// else return nothing, solve immediately
 

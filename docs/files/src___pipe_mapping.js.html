@@ -96,36 +96,49 @@ define(function (require, exports, module) {
 	var _ = require(&#x27;lodash&#x27;);
 
 	/**
-	 * Defines destination
-	 *
-	 * @param  {[type]} destination [description]
-	 * @return {[type]}             [description]
+	 * [map description]
+	 * @param  {[type]} name       [description]
+	 * @param  {[type]} definition [description]
+	 * @return {[type]}            [description]
 	 */
-	exports.to = function pipeTo(destination) {
-		this.clearCache();
+	exports.map = function mapAttribute() {
 
-		this.destination = destination;
+		var src, dest;
+
+		if (_.isString(arguments[0])) {
+
+			// arguments = [src, dest]
+			src  = arguments[0];
+			dest = arguments[1] || src;
+
+			// dest must be an array
+			dest = _.isArray(dest) ? dest : [dest];
+
+			// set map.
+			this._map[src] = dest;
+
+		} else if (_.isObject(arguments[0])) {
+			// arguments = [{ src: dest }]
+
+			_.each(arguments[0], function (dest, src) {
+				this.map(src, dest);
+			}, this);
+
+		}
 
 		return this;
 	};
-
-
 
 	/**
-	 * Defines the source.
-	 *
-	 * @param  {[type]} source [description]
-	 * @return {[type]}        [description]
+	 * [removeLine description]
+	 * @param  {[type]} name [description]
+	 * @return {[type]}      [description]
 	 */
-	exports.from = function pipeFrom(source) {
-		// restart cache
-		this.clearCache();
-
-		this.source = source;
+	exports.removeLine = function rmPipeLine(name) {
+		delete this._map[name];
 
 		return this;
 	};
-
 });
 
     </pre>

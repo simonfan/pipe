@@ -2,48 +2,6 @@
 
 /* jshint ignore:end */
 
-define('__pipe/mapping',['require','exports','module','lodash'],function (require, exports, module) {
-	
-
-	var _ = require('lodash');
-
-	/**
-	 * Defines destination
-	 *
-	 * @param  {[type]} destination [description]
-	 * @return {[type]}             [description]
-	 */
-	exports.to = function pipeTo(destination) {
-		this.clearCache();
-
-		this.destination = destination;
-
-		return this;
-	};
-
-
-
-	/**
-	 * Defines the source.
-	 *
-	 * @param  {[type]} source [description]
-	 * @return {[type]}        [description]
-	 */
-	exports.from = function pipeFrom(source) {
-		// restart cache
-		this.clearCache();
-
-		this.source = source;
-
-		return this;
-	};
-
-});
-
-/* jshint ignore:start */
-
-/* jshint ignore:end */
-
 define('__pipe/streams/pump',['require','exports','module','lodash','q'],function (require, exports, module) {
 	
 
@@ -60,7 +18,7 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 	 * @param  {[type]} properties  [description]
 	 * @return {[type]}             [description]
 	 */
-	function pumpValueToDestination(value, destination, properties) {
+	function pumpValue(value, destination, properties) {
 
 
 		var res = _.map(properties, function (prop) {
@@ -81,7 +39,7 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 	 * @param  {[type]} def [description]
 	 * @return {Promise}     [description]
 	 */
-	module.exports = function pump(srcProp, destProps, force) {
+	module.exports = function pumpPipeline(srcProp, destProps, force) {
 
 
 		var destination = this.destination;
@@ -97,7 +55,7 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 
 					// [3] resolve pumpDefer agter
 					//     value has been pumped to destination
-					return pumpValueToDestination.call(this, value, destination, destProps)
+					return pumpValue.call(this, value, destination, destProps)
 
 				}// else return nothing, solve immediately
 
@@ -158,17 +116,17 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 	 * @param  {[type]}   lines [description]
 	 * @return {[type]}         [description]
 	 */
-	function streamPipeline(streamFn, lines, force) {
+	function streamPipeline(streamFn, properties, force) {
 
 		// [1] create a deferred object.
 		var defer = q.defer();
 
-		// [2] pick the lines to be executed.
+		// [2] pick the properties to be executed.
 		//     defaults to ALL
-		lines = lines ? _.pick(this.lines, lines) : this.lines;
+		properties = properties ? _.pick(this._map, properties) : this._map;
 
 		// [3] call the streamFn for all lines.
-		var results = _.map(lines, function (destProps, srcProp) {
+		var results = _.map(properties, function (destProps, srcProp) {
 
 			// run the action
 			return streamFn.call(this, srcProp, destProps, force);
@@ -239,18 +197,18 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 
 /* jshint ignore:end */
 
-define('__pipe/line',['require','exports','module','lodash'],function (require, exports, module) {
+define('__pipe/mapping',['require','exports','module','lodash'],function (require, exports, module) {
 	
 
 	var _ = require('lodash');
 
 	/**
-	 * [line description]
+	 * [map description]
 	 * @param  {[type]} name       [description]
 	 * @param  {[type]} definition [description]
 	 * @return {[type]}            [description]
 	 */
-	exports.line = function pipeLine() {
+	exports.map = function mapAttribute() {
 
 		var src, dest;
 
@@ -263,14 +221,14 @@ define('__pipe/line',['require','exports','module','lodash'],function (require, 
 			// dest must be an array
 			dest = _.isArray(dest) ? dest : [dest];
 
-			// set line.
-			this.lines[src] = dest;
+			// set map.
+			this._map[src] = dest;
 
 		} else if (_.isObject(arguments[0])) {
 			// arguments = [{ src: dest }]
 
 			_.each(arguments[0], function (dest, src) {
-				this.line(src, dest);
+				this.map(src, dest);
 			}, this);
 
 		}
@@ -284,7 +242,7 @@ define('__pipe/line',['require','exports','module','lodash'],function (require, 
 	 * @return {[type]}      [description]
 	 */
 	exports.removeLine = function rmPipeLine(name) {
-		delete this.lines[name];
+		delete this._map[name];
 
 		return this;
 	};
@@ -304,7 +262,7 @@ define('__pipe/line',['require','exports','module','lodash'],function (require, 
 
 /* jshint ignore:end */
 
-define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping','./__pipe/streams/index','./__pipe/line'],function (require, exports, module) {
+define('pipe',['require','exports','module','subject','lodash','./__pipe/streams/index','./__pipe/mapping'],function (require, exports, module) {
 	
 
 	var subject = require('subject'),
@@ -322,7 +280,7 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 		 * @param  {[type]} options   [description]
 		 * @return {[type]}           [description]
 		 */
-		initialize: function initialize(lines, options) {
+		initialize: function initialize(mappings, options) {
 
 			options = options || {};
 
@@ -350,9 +308,9 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 				this.to(options.destination);
 			}
 
-			// object on which line mappings will be stored.
-			this.lines = {};
-			this.line(lines);
+			// object on which mappings will be stored.
+			this._map = {};
+			this.map(mappings);
 		},
 
 		get: function pipeGet(object, property) {
@@ -414,11 +372,42 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 			}
 
 		},
+
+		/**
+		 * Defines destination
+		 *
+		 * @param  {[type]} destination [description]
+		 * @return {[type]}             [description]
+		 */
+		to: function pipeTo(destination) {
+			this.clearCache();
+
+			this.destination = destination;
+
+			return this;
+		},
+
+
+
+		/**
+		 * Defines the source.
+		 *
+		 * @param  {[type]} source [description]
+		 * @return {[type]}        [description]
+		 */
+		from: function pipeFrom(source) {
+			// restart cache
+			this.clearCache();
+
+			this.source = source;
+
+			return this;
+		},
+
 	});
 
 	// prototype
-	pipe.assignProto(require('./__pipe/mapping'))
-		.assignProto(require('./__pipe/streams/index'))
-		.assignProto(require('./__pipe/line'));
+	pipe.assignProto(require('./__pipe/streams/index'))
+		.assignProto(require('./__pipe/mapping'));
 });
 

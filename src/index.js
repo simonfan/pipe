@@ -30,7 +30,7 @@ define(function (require, exports, module) {
 		 * @param  {[type]} options   [description]
 		 * @return {[type]}           [description]
 		 */
-		initialize: function initialize(lines, options) {
+		initialize: function initialize(mappings, options) {
 
 			options = options || {};
 
@@ -58,9 +58,9 @@ define(function (require, exports, module) {
 				this.to(options.destination);
 			}
 
-			// object on which line mappings will be stored.
-			this.lines = {};
-			this.line(lines);
+			// object on which mappings will be stored.
+			this._map = {};
+			this.map(mappings);
 		},
 
 		get: function pipeGet(object, property) {
@@ -122,10 +122,41 @@ define(function (require, exports, module) {
 			}
 
 		},
+
+		/**
+		 * Defines destination
+		 *
+		 * @param  {[type]} destination [description]
+		 * @return {[type]}             [description]
+		 */
+		to: function pipeTo(destination) {
+			this.clearCache();
+
+			this.destination = destination;
+
+			return this;
+		},
+
+
+
+		/**
+		 * Defines the source.
+		 *
+		 * @param  {[type]} source [description]
+		 * @return {[type]}        [description]
+		 */
+		from: function pipeFrom(source) {
+			// restart cache
+			this.clearCache();
+
+			this.source = source;
+
+			return this;
+		},
+
 	});
 
 	// prototype
-	pipe.assignProto(require('./__pipe/mapping'))
-		.assignProto(require('./__pipe/streams/index'))
-		.assignProto(require('./__pipe/line'));
+	pipe.assignProto(require('./__pipe/streams/index'))
+		.assignProto(require('./__pipe/mapping'));
 });

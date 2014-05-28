@@ -15,17 +15,17 @@ define(function (require, exports, module) {
 	 * @param  {[type]}   lines [description]
 	 * @return {[type]}         [description]
 	 */
-	function streamPipeline(streamFn, lines, force) {
+	function streamPipeline(streamFn, properties, force) {
 
 		// [1] create a deferred object.
 		var defer = q.defer();
 
-		// [2] pick the lines to be executed.
+		// [2] pick the properties to be executed.
 		//     defaults to ALL
-		lines = lines ? _.pick(this.lines, lines) : this.lines;
+		properties = properties ? _.pick(this._map, properties) : this._map;
 
 		// [3] call the streamFn for all lines.
-		var results = _.map(lines, function (destProps, srcProp) {
+		var results = _.map(properties, function (destProps, srcProp) {
 
 			// run the action
 			return streamFn.call(this, srcProp, destProps, force);

@@ -25,13 +25,6 @@
             "fors": {},
             "namespaces": {}
         },
-        "src/__pipe/line.js": {
-            "name": "src/__pipe/line.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
         "src/__pipe/mapping.js": {
             "name": "src/__pipe/mapping.js",
             "modules": {},
@@ -187,9 +180,9 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/line.js",
+            "file": "src/__pipe/mapping.js",
             "line": 10,
-            "description": "[line description]",
+            "description": "[map description]",
             "params": [
                 {
                     "name": "name",
@@ -209,46 +202,12 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/line.js",
+            "file": "src/__pipe/mapping.js",
             "line": 44,
             "description": "[removeLine description]",
             "params": [
                 {
                     "name": "name",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/mapping.js",
-            "line": 10,
-            "description": "Defines destination",
-            "params": [
-                {
-                    "name": "destination",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/mapping.js",
-            "line": 26,
-            "description": "Defines the source.",
-            "params": [
-                {
-                    "name": "source",
                     "description": "[description]",
                     "type": "[type]"
                 }
@@ -304,6 +263,42 @@
             },
             "class": "",
             "module": "pipe"
+        },
+        {
+            "file": "src/index.js",
+            "line": 126,
+            "description": "Defines destination",
+            "params": [
+                {
+                    "name": "destination",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": "",
+            "module": "pipe"
+        },
+        {
+            "file": "src/index.js",
+            "line": 142,
+            "description": "Defines the source.",
+            "params": [
+                {
+                    "name": "source",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": "",
+            "module": "pipe"
         }
     ],
     "warnings": [
@@ -336,20 +331,12 @@
             "line": " src/__pipe/streams/pump.js:34"
         },
         {
-            "message": "Missing item type\n[line description]",
-            "line": " src/__pipe/line.js:10"
-        },
-        {
-            "message": "Missing item type\n[removeLine description]",
-            "line": " src/__pipe/line.js:44"
-        },
-        {
-            "message": "Missing item type\nDefines destination",
+            "message": "Missing item type\n[map description]",
             "line": " src/__pipe/mapping.js:10"
         },
         {
-            "message": "Missing item type\nDefines the source.",
-            "line": " src/__pipe/mapping.js:26"
+            "message": "Missing item type\n[removeLine description]",
+            "line": " src/__pipe/mapping.js:44"
         },
         {
             "message": "Missing item type\n[initialize description]",
@@ -358,6 +345,14 @@
         {
             "message": "Missing item type\nDoes two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
             "line": " src/index.js:92"
+        },
+        {
+            "message": "Missing item type\nDefines destination",
+            "line": " src/index.js:126"
+        },
+        {
+            "message": "Missing item type\nDefines the source.",
+            "line": " src/index.js:142"
         }
     ]
 }
