@@ -47,11 +47,5 @@
 				});
 
 		});
-
-		it('pump() to many', function () {
-
-
-
-		});
 	});
 });

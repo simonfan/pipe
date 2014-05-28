@@ -15,7 +15,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]}   lines [description]
 	 * @return {[type]}         [description]
 	 */
-	function streamPipeline(streamFn, lines) {
+	function streamPipeline(streamFn, lines, force) {
 
 		// [1] create a deferred object.
 		var defer = q.defer();
@@ -28,7 +28,7 @@ define(function (require, exports, module) {
 		var results = _.map(lines, function (destProps, srcProp) {
 
 			// run the action
-			return streamFn.call(this, srcProp, destProps);
+			return streamFn.call(this, srcProp, destProps, force);
 
 		}, this);
 
@@ -61,7 +61,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]} data [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.inject = function inject(data) {
+	exports.inject = function inject(data, force) {
 
 		// [0] throw error if there is no source in the pipe object.
 		if (!this.source) {
@@ -71,7 +71,9 @@ define(function (require, exports, module) {
 		// [1] SET all data onto the SOURCE
 		var srcSetRes = _.map(data, function (value, key) {
 
-			return this._srcSet(this.source, key, value);
+			if (!this.isCached(key, value) || force) {
+				return this._srcSet(this.source, key, value);
+			}
 
 		}, this);
 
@@ -82,7 +84,7 @@ define(function (require, exports, module) {
 			// [2.1] then invoke pump on success
 			//       wrap in a method in order to guarantee
 			//       pump is invoked with NO ARGUMENTS
-			_.bind(function() { this.pump(); }, this),
+			_.bind(function() { this.pump(void(0), true); }, this),
 
 			// [2.2] or throw error
 			function (e) { throw e; }

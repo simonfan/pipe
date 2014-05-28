@@ -32,25 +32,6 @@ define(function (require, exports, module) {
 	}
 
 	/**
-	 * MULTIPLE DESTINATIONS
-	 *
-	 * @param  {[type]} value        [description]
-	 * @param  {[type]} destinations [description]
-	 * @param  {[type]} properties   [description]
-	 * @return {[type]}              [description]
-	 */
-	function pumpValueToDestinations(value, destinations, properties) {
-
-		var res = _.map(destinations, function (dest) {
-
-			return pumpValueToDestination.call(this, value, dest, properties);
-
-		}, this);
-
-		return q.all(res);
-	}
-
-	/**
 	 * Runs a single line
 	 * testing its matcher across all properties of the source object.
 	 *
@@ -58,7 +39,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]} def [description]
 	 * @return {Promise}     [description]
 	 */
-	module.exports = function pump(srcProp, destProps) {
+	module.exports = function pump(srcProp, destProps, force) {
 
 
 		var destination = this.destination;
@@ -70,15 +51,11 @@ define(function (require, exports, module) {
 
 				// [2.1] check if cached value is the same as
 				//       current value
-				if (value !== this.cache.src[srcProp]) {
-
-					// [2.2] set value to cache
-					this.cache.src[srcProp] = value;
+				if (!this.isCached(srcProp, value) || force) {
 
 					// [3] resolve pumpDefer agter
 					//     value has been pumped to destination
 					return pumpValueToDestination.call(this, value, destination, destProps)
-
 
 				}// else return nothing, solve immediately
 

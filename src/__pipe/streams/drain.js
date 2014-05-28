@@ -15,13 +15,13 @@ define(function (require, exports, module) {
 	 * @param  {[type]} destProps [description]
 	 * @return {[type]}           [description]
 	 */
-	module.exports = function drainPipeline(srcProp, destProps) {
+	module.exports = function drainPipeline(srcProp, destProps, force) {
 
 		// [1] GET value from the first DESTINATION (destinations[0])
 		return q(this._destGet(this.destination, destProps[0]))
 			.then(_.bind(function (value) {
 				// [2] check cache
-				if (value !== this.cache.dest[destProps]) {
+				if (!this.isCached(srcProp, value) || force) {
 
 					// [2.1] SET value onto SOURCE
 					return this._srcSet(this.source, srcProp, value);

@@ -19,7 +19,7 @@
 })('test', function(pipe, should) {
 	'use strict';
 
-	describe('pipe string-line-partials', function () {
+	describe('pipe inject', function () {
 		it('is fine (:', function (done) {
 
 			var destination = {

@@ -74,25 +74,6 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 	}
 
 	/**
-	 * MULTIPLE DESTINATIONS
-	 *
-	 * @param  {[type]} value        [description]
-	 * @param  {[type]} destinations [description]
-	 * @param  {[type]} properties   [description]
-	 * @return {[type]}              [description]
-	 */
-	function pumpValueToDestinations(value, destinations, properties) {
-
-		var res = _.map(destinations, function (dest) {
-
-			return pumpValueToDestination.call(this, value, dest, properties);
-
-		}, this);
-
-		return q.all(res);
-	}
-
-	/**
 	 * Runs a single line
 	 * testing its matcher across all properties of the source object.
 	 *
@@ -100,7 +81,7 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 	 * @param  {[type]} def [description]
 	 * @return {Promise}     [description]
 	 */
-	module.exports = function pump(srcProp, destProps) {
+	module.exports = function pump(srcProp, destProps, force) {
 
 
 		var destination = this.destination;
@@ -112,15 +93,11 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 
 				// [2.1] check if cached value is the same as
 				//       current value
-				if (value !== this.cache.src[srcProp]) {
-
-					// [2.2] set value to cache
-					this.cache.src[srcProp] = value;
+				if (!this.isCached(srcProp, value) || force) {
 
 					// [3] resolve pumpDefer agter
 					//     value has been pumped to destination
 					return pumpValueToDestination.call(this, value, destination, destProps)
-
 
 				}// else return nothing, solve immediately
 
@@ -146,13 +123,13 @@ define('__pipe/streams/drain',['require','exports','module','lodash','q'],functi
 	 * @param  {[type]} destProps [description]
 	 * @return {[type]}           [description]
 	 */
-	module.exports = function drainPipeline(srcProp, destProps) {
+	module.exports = function drainPipeline(srcProp, destProps, force) {
 
 		// [1] GET value from the first DESTINATION (destinations[0])
 		return q(this._destGet(this.destination, destProps[0]))
 			.then(_.bind(function (value) {
 				// [2] check cache
-				if (value !== this.cache.dest[destProps]) {
+				if (!this.isCached(srcProp, value) || force) {
 
 					// [2.1] SET value onto SOURCE
 					return this._srcSet(this.source, srcProp, value);
@@ -181,7 +158,7 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 	 * @param  {[type]}   lines [description]
 	 * @return {[type]}         [description]
 	 */
-	function streamPipeline(streamFn, lines) {
+	function streamPipeline(streamFn, lines, force) {
 
 		// [1] create a deferred object.
 		var defer = q.defer();
@@ -194,7 +171,7 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 		var results = _.map(lines, function (destProps, srcProp) {
 
 			// run the action
-			return streamFn.call(this, srcProp, destProps);
+			return streamFn.call(this, srcProp, destProps, force);
 
 		}, this);
 
@@ -227,7 +204,7 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 	 * @param  {[type]} data [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.inject = function inject(data) {
+	exports.inject = function inject(data, force) {
 
 		// [0] throw error if there is no source in the pipe object.
 		if (!this.source) {
@@ -237,7 +214,9 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 		// [1] SET all data onto the SOURCE
 		var srcSetRes = _.map(data, function (value, key) {
 
-			return this._srcSet(this.source, key, value);
+			if (!this.isCached(key, value) || force) {
+				return this._srcSet(this.source, key, value);
+			}
 
 		}, this);
 
@@ -248,7 +227,7 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 			// [2.1] then invoke pump on success
 			//       wrap in a method in order to guarantee
 			//       pump is invoked with NO ARGUMENTS
-			_.bind(function() { this.pump(); }, this),
+			_.bind(function() { this.pump(void(0), true); }, this),
 
 			// [2.2] or throw error
 			function (e) { throw e; }
@@ -359,10 +338,9 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 			this._destSet = this.destSet || this.set;
 
 			// the cache. if set to false, no cache will be used.
-			this.cache = options.cache === false ? false : {
-				src: {},
-				dest: {},
-			};
+			if (options.cache !== false) {
+				this.clearCache();
+			}
 
 			if (options.source) {
 				this.from(options.source);
@@ -387,23 +365,54 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/mapping
 			return object;
 		},
 
-/*
+	/*
 
-	exports.srcGet
-	exports.srcSet
+		srcGet:
+		srcSet
 
-	exports.destGet
-	exports.destSet
-*/
+		destGet:
+		destSet:
+	*/
 
 
 		clearCache: function clearCache() {
-			this.cache = {
-				src: {},
-				dest: {},
-			};
+			this.cache = {};
 
 			return this;
+		},
+
+		/**
+		 * Does two things:
+		 * [1] checks if the value is the same that is in cache
+		 * (and return at end of execution)
+		 * [2] if different, sets the value
+		 *
+		 * @param  {[type]} property [description]
+		 * @param  {[type]} value    [description]
+		 * @return {[type]}          [description]
+		 */
+		isCached: function isCached(property, value) {
+			if (!this.cache) {
+
+				// no cache, always return false
+				return false;
+
+			} else {
+
+				if (this.cache[property] !== value) {
+
+					// set cache value
+					this.cache[property] = value;
+
+					// value not in cache
+					return false;
+				} else {
+					// values are equal
+					// value in cache
+					return true;
+				}
+			}
+
 		},
 	});
 

@@ -134,10 +134,9 @@ define(function (require, exports, module) {
 			this._destSet = this.destSet || this.set;
 
 			// the cache. if set to false, no cache will be used.
-			this.cache = options.cache === false ? false : {
-				src: {},
-				dest: {},
-			};
+			if (options.cache !== false) {
+				this.clearCache();
+			}
 
 			if (options.source) {
 				this.from(options.source);
@@ -162,23 +161,54 @@ define(function (require, exports, module) {
 			return object;
 		},
 
-/*
+	/*
 
-	exports.srcGet
-	exports.srcSet
+		srcGet:
+		srcSet
 
-	exports.destGet
-	exports.destSet
-*/
+		destGet:
+		destSet:
+	*/
 
 
 		clearCache: function clearCache() {
-			this.cache = {
-				src: {},
-				dest: {},
-			};
+			this.cache = {};
 
 			return this;
+		},
+
+		/**
+		 * Does two things:
+		 * [1] checks if the value is the same that is in cache
+		 * (and return at end of execution)
+		 * [2] if different, sets the value
+		 *
+		 * @param  {[type]} property [description]
+		 * @param  {[type]} value    [description]
+		 * @return {[type]}          [description]
+		 */
+		isCached: function isCached(property, value) {
+			if (!this.cache) {
+
+				// no cache, always return false
+				return false;
+
+			} else {
+
+				if (this.cache[property] !== value) {
+
+					// set cache value
+					this.cache[property] = value;
+
+					// value not in cache
+					return false;
+				} else {
+					// values are equal
+					// value in cache
+					return true;
+				}
+			}
+
 		},
 	});
 

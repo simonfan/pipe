@@ -121,7 +121,7 @@
 
 					var delay = new Date() - time;
 
-					delay.should.be.greaterThan(500, 'delayedAttr delay: 250, delayedSet delay: 250');
+					delay.should.be.greaterThan(499, 'delayedAttr delay: 250, delayedSet delay: 250');
 					delay.should.be.lessThan(570);
 
 					destination.data.destKey1.should.eql('value-1');
@@ -149,7 +149,7 @@
 
 					var delay = new Date() - time;
 
-					delay.should.be.greaterThan(500, 'delayedAttr delay: 250, delayedSet delay: 250');
+					delay.should.be.greaterThan(499, 'delayedAttr delay: 250, delayedSet delay: 250');
 					delay.should.be.lessThan(570);
 
 

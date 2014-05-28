@@ -172,33 +172,6 @@
         {
             "file": "src/__pipe/streams/pump.js",
             "line": 34,
-            "description": "MULTIPLE DESTINATIONS",
-            "params": [
-                {
-                    "name": "value",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "destinations",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "properties",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/streams/pump.js",
-            "line": 53,
             "description": "Runs a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
             "params": [
                 {
@@ -308,6 +281,29 @@
             },
             "class": "",
             "module": "pipe"
+        },
+        {
+            "file": "src/index.js",
+            "line": 92,
+            "description": "Does two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
+            "params": [
+                {
+                    "name": "property",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "value",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": "",
+            "module": "pipe"
         }
     ],
     "warnings": [
@@ -336,12 +332,8 @@
             "line": " src/__pipe/streams/pump.js:13"
         },
         {
-            "message": "Missing item type\nMULTIPLE DESTINATIONS",
-            "line": " src/__pipe/streams/pump.js:34"
-        },
-        {
             "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
-            "line": " src/__pipe/streams/pump.js:53"
+            "line": " src/__pipe/streams/pump.js:34"
         },
         {
             "message": "Missing item type\n[line description]",
@@ -362,6 +354,10 @@
         {
             "message": "Missing item type\n[initialize description]",
             "line": " src/index.js:27"
+        },
+        {
+            "message": "Missing item type\nDoes two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
+            "line": " src/index.js:92"
         }
     ]
 }
