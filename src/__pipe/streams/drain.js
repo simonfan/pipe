@@ -6,8 +6,7 @@ define(function (require, exports, module) {
 	'use strict';
 
 
-	var _ = require('lodash'),
-		q = require('q');
+	var _ = require('lodash');
 
 	/**
 	 * [drainPipeline description]
@@ -18,17 +17,15 @@ define(function (require, exports, module) {
 	module.exports = function drainPipeline(srcProp, destProps, force) {
 
 		// [1] GET value from the first DESTINATION (destinations[0])
-		return q(this._destGet(this.destination, destProps[0]))
-			.then(_.bind(function (value) {
-				// [2] check cache
-				if (!this.isCached(srcProp, value) || force) {
+		var value = this._destGet(this.destination, destProps[0]);
 
-					// [2.1] SET value onto SOURCE
-					return this._srcSet(this.source, srcProp, value);
-				} // else: return undefined (solve immediately)
-			}, this))
-			.fail(function (e) { throw e; });
+		// [2] check cache
+		if (!this.isCached(srcProp, value) || force) {
+			// [2.1] SET value onto SOURCE
+			this._srcSet(this.source, srcProp, value);
+		}
 
+		return this;
 	};
 
 });

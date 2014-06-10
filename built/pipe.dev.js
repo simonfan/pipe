@@ -2,12 +2,11 @@
 
 /* jshint ignore:end */
 
-define('__pipe/streams/pump',['require','exports','module','lodash','q'],function (require, exports, module) {
+define('__pipe/streams/pump',['require','exports','module','lodash'],function (require, exports, module) {
 	
 
 
-	var _ = require('lodash'),
-		q = require('q');
+	var _ = require('lodash');
 
 
 	/**
@@ -21,14 +20,12 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 	function pumpValue(value, destination, properties) {
 
 
-		var res = _.map(properties, function (prop) {
+		_.each(properties, function (prop) {
 
 			// [2.1.1.1] SET value onto DESTINATION
 			return this._destSet(destination, prop, value);
 
 		}, this);
-
-		return q.all(res);
 	}
 
 	/**
@@ -44,23 +41,17 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 
 		var destination = this.destination;
 
+
 		// [1] GET value from SOURCE
-		return q(this._srcGet(this.source, srcProp))
-			// [2] promise then
-			.then(_.bind(function (value) {
+		var value = this._srcGet(this.source, srcProp);
 
-				// [2.1] check if cached value is the same as
-				//       current value
-				if (!this.isCached(srcProp, value) || force) {
+		// [2] SET value
+		// [2.1] check if cached value is the same as current value
+		if (!this.isCached(srcProp, value) || force) {
 
-					// [3] resolve pumpDefer agter
-					//     value has been pumped to destination
-					return pumpValue.call(this, value, destination, destProps)
-
-				}// else return nothing, solve immediately
-
-			}, this))
-			.fail(function (e) { throw e; });
+			// [2.2] pump values.
+			pumpValue.call(this, value, destination, destProps);
+		}
 	};
 });
 
@@ -68,12 +59,11 @@ define('__pipe/streams/pump',['require','exports','module','lodash','q'],functio
 
 /* jshint ignore:end */
 
-define('__pipe/streams/drain',['require','exports','module','lodash','q'],function (require, exports, module) {
+define('__pipe/streams/drain',['require','exports','module','lodash'],function (require, exports, module) {
 	
 
 
-	var _ = require('lodash'),
-		q = require('q');
+	var _ = require('lodash');
 
 	/**
 	 * [drainPipeline description]
@@ -84,17 +74,15 @@ define('__pipe/streams/drain',['require','exports','module','lodash','q'],functi
 	module.exports = function drainPipeline(srcProp, destProps, force) {
 
 		// [1] GET value from the first DESTINATION (destinations[0])
-		return q(this._destGet(this.destination, destProps[0]))
-			.then(_.bind(function (value) {
-				// [2] check cache
-				if (!this.isCached(srcProp, value) || force) {
+		var value = this._destGet(this.destination, destProps[0]);
 
-					// [2.1] SET value onto SOURCE
-					return this._srcSet(this.source, srcProp, value);
-				} // else: return undefined (solve immediately)
-			}, this))
-			.fail(function (e) { throw e; });
+		// [2] check cache
+		if (!this.isCached(srcProp, value) || force) {
+			// [2.1] SET value onto SOURCE
+			this._srcSet(this.source, srcProp, value);
+		}
 
+		return this;
 	};
 
 });
@@ -103,11 +91,10 @@ define('__pipe/streams/drain',['require','exports','module','lodash','q'],functi
 
 /* jshint ignore:end */
 
-define('__pipe/streams/index',['require','exports','module','lodash','q','./pump','./drain'],function (require, exports, module) {
+define('__pipe/streams/index',['require','exports','module','lodash','./pump','./drain'],function (require, exports, module) {
 	
 
-	var _ = require('lodash'),
-		q = require('q');
+	var _ = require('lodash');
 
 	/**
 	 * runs action with lines.
@@ -118,30 +105,20 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 	 */
 	function streamPipeline(streamFn, properties, force) {
 
-		// [1] create a deferred object.
-		var defer = q.defer();
-
 		// [2] pick the properties to be executed.
 		//     defaults to ALL
 		properties = properties ? _.pick(this._map, properties) : this._map;
 
 		// [3] call the streamFn for all lines.
-		var results = _.map(properties, function (destProps, srcProp) {
+		_.each(properties, function (destProps, srcProp) {
 
 			// run the action
-			return streamFn.call(this, srcProp, destProps, force);
+			streamFn.call(this, srcProp, destProps, force);
 
 		}, this);
 
-		// [4] resolve the deferred object with NO VALUES
-		//     when all the streamFn invocations have been completed.
-		q.all(results).done(function () {
-			// resolve with no arguments.
-			defer.resolve();
-		});
-
-		// [5] return the promise.
-		return defer.promise;
+		// [4] return this.
+		return this;
 	}
 
 	/**
@@ -170,26 +147,16 @@ define('__pipe/streams/index',['require','exports','module','lodash','q','./pump
 		}
 
 		// [1] SET all data onto the SOURCE
-		var srcSetRes = _.map(data, function (value, key) {
+		_.each(data, function (value, key) {
 
 			if (!this.isCached(key, value) || force) {
-				return this._srcSet(this.source, key, value);
+				this._srcSet(this.source, key, value);
 			}
 
 		}, this);
 
-
-		// [2] wait for all srcSets
-		return q.all(srcSetRes).then(
-
-			// [2.1] then invoke pump on success
-			//       wrap in a method in order to guarantee
-			//       pump is invoked with NO ARGUMENTS
-			_.bind(function() { this.pump(void(0), true); }, this),
-
-			// [2.2] or throw error
-			function (e) { throw e; }
-		);
+		// [2] pump data (no specific pipelines, force = true)
+		this.pump(null, true);
 	};
 });
 

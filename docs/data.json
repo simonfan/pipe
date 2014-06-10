@@ -59,7 +59,7 @@
     "classitems": [
         {
             "file": "src/__pipe/streams/drain.js",
-            "line": 12,
+            "line": 11,
             "description": "[drainPipeline description]",
             "params": [
                 {
@@ -81,7 +81,7 @@
         },
         {
             "file": "src/__pipe/streams/index.js",
-            "line": 11,
+            "line": 10,
             "description": "runs action with lines.",
             "params": [
                 {
@@ -103,7 +103,7 @@
         },
         {
             "file": "src/__pipe/streams/index.js",
-            "line": 46,
+            "line": 35,
             "description": "[exports description]",
             "return": {
                 "description": "[description]",
@@ -113,14 +113,14 @@
         },
         {
             "file": "src/__pipe/streams/index.js",
-            "line": 52,
+            "line": 41,
             "description": "[drain description]",
             "type": "{[type]}",
             "class": ""
         },
         {
             "file": "src/__pipe/streams/index.js",
-            "line": 58,
+            "line": 47,
             "description": "Sets data onto source AND pumpes.",
             "params": [
                 {
@@ -137,7 +137,7 @@
         },
         {
             "file": "src/__pipe/streams/pump.js",
-            "line": 13,
+            "line": 12,
             "description": "SINGLE DESTINATION",
             "params": [
                 {
@@ -164,7 +164,7 @@
         },
         {
             "file": "src/__pipe/streams/pump.js",
-            "line": 34,
+            "line": 31,
             "description": "Runs a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
             "params": [
                 {
@@ -304,31 +304,31 @@
     "warnings": [
         {
             "message": "Missing item type\n[drainPipeline description]",
-            "line": " src/__pipe/streams/drain.js:12"
+            "line": " src/__pipe/streams/drain.js:11"
         },
         {
             "message": "Missing item type\nruns action with lines.",
-            "line": " src/__pipe/streams/index.js:11"
+            "line": " src/__pipe/streams/index.js:10"
         },
         {
             "message": "Missing item type\n[exports description]",
-            "line": " src/__pipe/streams/index.js:46"
+            "line": " src/__pipe/streams/index.js:35"
         },
         {
             "message": "Missing item type\n[drain description]",
-            "line": " src/__pipe/streams/index.js:52"
+            "line": " src/__pipe/streams/index.js:41"
         },
         {
             "message": "Missing item type\nSets data onto source AND pumpes.",
-            "line": " src/__pipe/streams/index.js:58"
+            "line": " src/__pipe/streams/index.js:47"
         },
         {
             "message": "Missing item type\nSINGLE DESTINATION",
-            "line": " src/__pipe/streams/pump.js:13"
+            "line": " src/__pipe/streams/pump.js:12"
         },
         {
             "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
-            "line": " src/__pipe/streams/pump.js:34"
+            "line": " src/__pipe/streams/pump.js:31"
         },
         {
             "message": "Missing item type\n[map description]",

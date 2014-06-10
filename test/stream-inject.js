@@ -20,7 +20,7 @@
 	'use strict';
 
 	describe('pipe inject', function () {
-		it('is fine (:', function (done) {
+		it('is fine (:', function () {
 
 			var destination = {
 				set: function (key, value) {
@@ -53,18 +53,15 @@
 			dataPipe.inject({
 				keyA: 'valueA',
 				keyB: 'valueB'
-			})
-			.done(function () {
-
-
-				source.keyA.should.eql('valueA');
-				source.keyB.should.eql('valueB');
-
-				destination.destKeyA.should.eql('valueA');
-				destination.destKeyB.should.eql('valueB');
-
-				done()
 			});
+
+
+
+			source.keyA.should.eql('valueA');
+			source.keyB.should.eql('valueB');
+
+			destination.destKeyA.should.eql('valueA');
+			destination.destKeyB.should.eql('valueB');
 
 		});
 	});

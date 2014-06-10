@@ -6,8 +6,7 @@ define(function (require, exports, module) {
 	'use strict';
 
 
-	var _ = require('lodash'),
-		q = require('q');
+	var _ = require('lodash');
 
 
 	/**
@@ -21,14 +20,12 @@ define(function (require, exports, module) {
 	function pumpValue(value, destination, properties) {
 
 
-		var res = _.map(properties, function (prop) {
+		_.each(properties, function (prop) {
 
 			// [2.1.1.1] SET value onto DESTINATION
 			return this._destSet(destination, prop, value);
 
 		}, this);
-
-		return q.all(res);
 	}
 
 	/**
@@ -44,22 +41,16 @@ define(function (require, exports, module) {
 
 		var destination = this.destination;
 
+
 		// [1] GET value from SOURCE
-		return q(this._srcGet(this.source, srcProp))
-			// [2] promise then
-			.then(_.bind(function (value) {
+		var value = this._srcGet(this.source, srcProp);
 
-				// [2.1] check if cached value is the same as
-				//       current value
-				if (!this.isCached(srcProp, value) || force) {
+		// [2] SET value
+		// [2.1] check if cached value is the same as current value
+		if (!this.isCached(srcProp, value) || force) {
 
-					// [3] resolve pumpDefer agter
-					//     value has been pumped to destination
-					return pumpValue.call(this, value, destination, destProps)
-
-				}// else return nothing, solve immediately
-
-			}, this))
-			.fail(function (e) { throw e; });
+			// [2.2] pump values.
+			pumpValue.call(this, value, destination, destProps);
+		}
 	};
 });
