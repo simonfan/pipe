@@ -87,7 +87,7 @@
 			.to(destination);
 		});
 
-		it('drains', function (testdone) {
+		it('drains', function () {
 
 			var destination = this.destination,
 				source      = this.source,
@@ -98,19 +98,14 @@
 			destination.set('destKey2', 'value2')
 
 			// drain values
-			pipe.drain()
-				.done(function () {
+			pipe.drain();
 
-					// source should have changed
-					source.attr('key1').should.eql('v1');
-					source.attr('key2').should.eql(destination.get('destKey2'));
-
-					testdone();
-				});
-
+			// source should have changed
+			source.attr('key1').should.eql('v1');
+			source.attr('key2').should.eql(destination.get('destKey2'));
 		});
 
-		it('pumps', function (testdone) {
+		it('pumps', function () {
 
 			var destination = this.destination,
 				source      = this.source,
@@ -120,14 +115,10 @@
 			source.attr('key1', 'v1');
 			source.attr('key2', 'value2');
 
-			pipe.pump()
-				.done(function () {
+			pipe.pump();
 
-					destination.get('destKey1').should.eql(source.attr('key1'));
-					destination.get('destKey2').should.eql(source.attr('key2'));
-
-					testdone();
-				});
+			destination.get('destKey1').should.eql(source.attr('key1'));
+			destination.get('destKey2').should.eql(source.attr('key2'));
 
 		});
 	});

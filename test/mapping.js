@@ -21,7 +21,7 @@
 
 	describe('pipe mapping', function () {
 
-		it('pipe.from(source)', function (testdone) {
+		it('pipe.from(source)', function () {
 
 			var destination = {},
 				source1     = {
@@ -41,31 +41,22 @@
 			.to(destination);
 
 
-			p.pump()
-				.then(function () {
+			p.pump();
 
-					destination.should.eql({
-						'dest-key1': 'source-1-v1',
-						'dest-key2': 'source-1-v2'
-					});
+			destination.should.eql({
+				'dest-key1': 'source-1-v1',
+				'dest-key2': 'source-1-v2'
+			});
 
-				})
-				.then(function () {
-					// change source
-					p.from(source2);
+			// change source
+			p.from(source2);
 
-					p.pump();
-				})
-				.then(function () {
+			p.pump();
 
-					destination.should.eql({
-						'dest-key1': 'source-2-v1',
-						'dest-key2': 'source-2-v2'
-					});
-
-					testdone();
-				})
-				.done();
+			destination.should.eql({
+				'dest-key1': 'source-2-v1',
+				'dest-key2': 'source-2-v2'
+			});
 
 		});
 

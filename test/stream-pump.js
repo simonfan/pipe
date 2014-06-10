@@ -36,16 +36,12 @@
 			.from(source)
 			.to(destination);
 
-			p.pump()
-				.done(function () {
+			p.pump();
 
-					destination.should.eql({
-						destKey1: 'v1',
-						destKey2: 'v2'
-					});
-
-				});
-
+			destination.should.eql({
+				destKey1: 'v1',
+				destKey2: 'v2'
+			});
 		});
 	});
 });

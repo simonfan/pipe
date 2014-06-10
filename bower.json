@@ -1,12 +1,11 @@
 {
   "name": "pipe",
   "main": "built/pipe.js",
-  "version": "0.5.4",
+  "version": "0.6.4",
   "description": "Some module...",
   "dependencies": {
     "subject": "~0.5.8",
-    "lodash": "~2.4.1",
-    "q": "1.0.1"
+    "lodash": "~2.4.1"
   },
   "devDependencies": {
     "requirejs": "*",

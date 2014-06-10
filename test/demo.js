@@ -21,7 +21,7 @@
 
 	describe('pipe demo', function () {
 
-		it('demo', function (done) {
+		it('demo', function () {
 
 			function set(object, key, value) {
 				object[key] = value;
@@ -63,29 +63,18 @@
 			source.sourceK2 = 'value-2';
 
 			// execute
-			dataPipe
-				.pump()
-				.then(function () {
-					// check that destination methods were run.
-					destination.k1.should.eql('value-1');
-					destination.k2.should.eql('value-2');
-				})
-				.then(function () {
+			dataPipe.pump();
+			// check that destination methods were run.
+			destination.k1.should.eql('value-1');
+			destination.k2.should.eql('value-2');
 
-					// change data and push again
-					source.sourceK1 = 'value-1-2';
-					source.sourceK2 = 'value-2-2';
-					return dataPipe.pump();
-				})
-				.then(function () {
+			// change data and push again
+			source.sourceK1 = 'value-1-2';
+			source.sourceK2 = 'value-2-2';
+			dataPipe.pump();
 
-					destination.k1.should.eql('value-1-2');
-					destination.k2.should.eql('value-2-2');
-
-					done();
-				})
-				// finish
-				.done();
+			destination.k1.should.eql('value-1-2');
+			destination.k2.should.eql('value-2-2');
 		});
 	});
 });
