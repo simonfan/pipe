@@ -2,136 +2,95 @@
 
 /* jshint ignore:end */
 
-define('__pipe/streams/pump',['require','exports','module','lodash'],function (require, exports, module) {
-	
-
-
-	var _ = require('lodash');
-
-
-	/**
-	 * SINGLE DESTINATION
-	 *
-	 * @param  {[type]} value       [description]
-	 * @param  {[type]} dest [description]
-	 * @param  {[type]} properties  [description]
-	 * @return {[type]}             [description]
-	 */
-	function pumpValue(value, dest, properties) {
-
-
-		_.each(properties, function (prop) {
-
-			// [2.1.1.1] SET value onto DESTINATION
-			return this._destSet(dest, prop, value);
-
-		}, this);
-	}
-
-	/**
-	 * Runs a single line
-	 * testing its matcher across all properties of the src object.
-	 *
-	 * [pumpPipe description]
-	 * @param  {[type]} def [description]
-	 * @return {Promise}     [description]
-	 */
-	module.exports = function pumpPipeline(srcProp, destProps, force) {
-
-
-		var dest = this.dest;
-
-
-		// [1] GET value from SOURCE
-		var value = this._srcGet(this.src, srcProp);
-
-		// [2] SET value
-		// [2.1] check if cached value is the same as current value
-		if (!this.isCached(srcProp, value) || force) {
-
-			// [2.2] pump values.
-			pumpValue.call(this, value, dest, destProps);
-		}
-	};
-});
-
-/* jshint ignore:start */
-
-/* jshint ignore:end */
-
-define('__pipe/streams/drain',['require','exports','module','lodash'],function (require, exports, module) {
-	
-
-
-	var _ = require('lodash');
-
-	/**
-	 * [drainPipeline description]
-	 * @param  {[type]} srcProp   [description]
-	 * @param  {[type]} destProps [description]
-	 * @return {[type]}           [description]
-	 */
-	module.exports = function drainPipeline(srcProp, destProps, force) {
-
-		// [1] GET value from the first DESTINATION (dests[0])
-		var value = this._destGet(this.dest, destProps[0]);
-
-		// [2] check cache
-		if (!this.isCached(srcProp, value) || force) {
-			// [2.1] SET value onto SOURCE
-			this._srcSet(this.src, srcProp, value);
-		}
-
-		return this;
-	};
-
-});
-
-/* jshint ignore:start */
-
-/* jshint ignore:end */
-
-define('__pipe/streams/index',['require','exports','module','lodash','./pump','./drain'],function (require, exports, module) {
+define('__pipe/pump',['require','exports','module','lodash'],function (require, exports, module) {
 	
 
 	var _ = require('lodash');
 
-	/**
-	 * runs action with lines.
-	 *
-	 * @param  {Function} fn    [description]
-	 * @param  {[type]}   lines [description]
-	 * @return {[type]}         [description]
-	 */
-	function streamPipeline(streamFn, properties, force) {
+
+	exports.pump = function pump(properties, force) {
+		// [1] keep properties in cache.
+		var map  = this.maps.pump,
+			src  = this.src,
+			dest = this.dest;
 
 		// [2] pick the properties to be executed.
 		//     defaults to ALL
-		properties = properties ? _.pick(this._map, properties) : this._map;
+		properties = properties ? _.pick(map, properties) : map;
 
-		// [3] call the streamFn for all lines.
+		// [3]
 		_.each(properties, function (destProps, srcProp) {
 
-			// run the action
-			streamFn.call(this, srcProp, destProps, force);
+			// [3.1] GET value from SOURCE
+			var value = this._srcGet(src, srcProp);
+
+			// [3.2] SET value
+			// [3.2.1] check if cached value is the same as current value
+			if (!this.isCached(srcProp, value) || force) {
+
+				// [3.2.2] pump values.
+				_.each(destProps, function (prop) {
+
+					return this._destSet(dest, prop, value);
+
+				}, this);
+			}
+
 
 		}, this);
 
-		// [4] return this.
+	};
+});
+
+/* jshint ignore:start */
+
+/* jshint ignore:end */
+
+define('__pipe/drain',['require','exports','module','lodash'],function (require, exports, module) {
+	
+
+	var _ = require('lodash');
+
+	exports.drain = function drain(properties, force) {
+
+		// [1] keep properties in cache.
+		var map  = this.maps.drain,
+			src  = this.src,
+			dest = this.dest;
+
+		// [2] pick the properties to be executed.
+		//     defaults to ALL
+		properties = properties ? _.pick(map, properties) : map;
+
+		// [3]
+		_.each(properties, function (destProps, srcProp) {
+
+
+			// [1] GET value from the first DESTINATION (dests[0])
+			var value = this._destGet(this.dest, destProps[0]);
+
+			// [2] check cache
+			if (!this.isCached(srcProp, value) || force) {
+				// [2.1] SET value onto SOURCE
+				this._srcSet(this.src, srcProp, value);
+			}
+
+		}, this);
+
+
+		// return this
 		return this;
-	}
+	};
+});
 
-	/**
-	 * [exports description]
-	 * @return {[type]} [description]
-	 */
-	exports.pump = _.partial(streamPipeline, require('./pump'));
+/* jshint ignore:start */
 
-	/**
-	 * [drain description]
-	 * @type {[type]}
-	 */
-	exports.drain = _.partial(streamPipeline, require('./drain'));
+/* jshint ignore:end */
+
+define('__pipe/inject',['require','exports','module','lodash'],function (require, exports, module) {
+	
+
+	var _ = require('lodash');
 
 	/**
 	 * Sets data onto src AND pumpes.
@@ -164,10 +123,39 @@ define('__pipe/streams/index',['require','exports','module','lodash','./pump','.
 
 /* jshint ignore:end */
 
-define('__pipe/mapping',['require','exports','module','lodash'],function (require, exports, module) {
+define('__pipe/map',['require','exports','module','lodash'],function (require, exports, module) {
 	
 
 	var _ = require('lodash');
+
+
+	/**
+	 * Maps a single.
+	 *
+	 * @param  {[type]} src  [description]
+	 * @param  {[type]} dest [description]
+	 * @param  {[type]} type [description]
+	 * @return {[type]}      [description]
+	 */
+	function mapSingleAttribute(src, dest, direction) {
+
+		// force dest into array format
+		dest = _.isArray(dest) ? dest : [dest];
+
+
+		if (direction && direction !== 'both') {
+
+			// specific map
+			this.maps[direction][src] = dest;
+
+		} else {
+
+			// set map on both
+			this.maps.drain[src] = dest;
+			this.maps.pump[src]  = dest;
+		}
+	}
+
 
 	/**
 	 * [map description]
@@ -181,21 +169,32 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 
 		if (_.isString(arguments[0])) {
 
-			// arguments = [src, dest]
-			src  = arguments[0];
-			dest = arguments[1] || src;
-
-			// dest must be an array
-			dest = _.isArray(dest) ? dest : [dest];
-
-			// set map.
-			this._map[src] = dest;
+			// map
+			mapSingleAttribute.apply(this, arguments);
 
 		} else if (_.isObject(arguments[0])) {
-			// arguments = [{ src: dest }]
+			// arguments = [{
+			// 		src: {
+			// 			dest: 'destAttribute',
+			// 			direction: 'dual' || 'drain' || 'pump'
+			// 		},
+			// 		src: 'destAttribute'  (direction = 'dual')
+			// }]
 
-			_.each(arguments[0], function (dest, src) {
-				this.map(src, dest);
+			_.each(arguments[0], function (destDef, src) {
+
+				var dest, direction;
+
+				if (_.isString(destDef)) {
+					dest      = destDef;
+				} else {
+					dest      = destDef.dest;
+					direction = destDef.direction;
+				}
+
+				// invoke map method.
+				mapSingleAttribute.call(this, src, dest, direction);
+
 			}, this);
 
 		}
@@ -204,12 +203,13 @@ define('__pipe/mapping',['require','exports','module','lodash'],function (requir
 	};
 
 	/**
-	 * [removeLine description]
+	 * [unmap description]
 	 * @param  {[type]} name [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.removeLine = function rmPipeLine(name) {
-		delete this._map[name];
+	exports.unmap = function unmapAttribute(name) {
+		delete this._mapDrain[name];
+		delete this._mapPump[name];
 
 		return this;
 	};
@@ -278,7 +278,7 @@ define('__pipe/cache',['require','exports','module'],function (require, exports,
 
 /* jshint ignore:end */
 
-define('pipe',['require','exports','module','subject','lodash','./__pipe/streams/index','./__pipe/mapping','./__pipe/cache'],function (require, exports, module) {
+define('pipe',['require','exports','module','subject','lodash','./__pipe/pump','./__pipe/drain','./__pipe/inject','./__pipe/map','./__pipe/cache'],function (require, exports, module) {
 	
 
 	var subject = require('subject'),
@@ -325,7 +325,10 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/streams
 			}
 
 			// object on which mappings will be stored.
-			this._map = {};
+			this.maps = {
+				drain: {},
+				pump : {}
+			};
 			this.map(mappings);
 		},
 
@@ -364,8 +367,10 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/streams
 	});
 
 	// prototype
-	pipe.assignProto(require('./__pipe/streams/index'))
-		.assignProto(require('./__pipe/mapping'))
+	pipe.assignProto(require('./__pipe/pump'))
+		.assignProto(require('./__pipe/drain'))
+		.assignProto(require('./__pipe/inject'))
+		.assignProto(require('./__pipe/map'))
 		.assignProto(require('./__pipe/cache'));
 });
 

@@ -59,7 +59,10 @@ define(function (require, exports, module) {
 			}
 
 			// object on which mappings will be stored.
-			this._map = {};
+			this.maps = {
+				drain: {},
+				pump : {}
+			};
 			this.map(mappings);
 		},
 
@@ -98,7 +101,9 @@ define(function (require, exports, module) {
 	});
 
 	// prototype
-	pipe.assignProto(require('./__pipe/streams/index'))
-		.assignProto(require('./__pipe/mapping'))
+	pipe.assignProto(require('./__pipe/pump'))
+		.assignProto(require('./__pipe/drain'))
+		.assignProto(require('./__pipe/inject'))
+		.assignProto(require('./__pipe/map'))
 		.assignProto(require('./__pipe/cache'));
 });

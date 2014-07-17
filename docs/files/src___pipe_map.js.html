@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/__pipe/streams/pump.js - pipe</title>
+    <title>src/__pipe/map.js - pipe</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -82,7 +82,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src/__pipe/streams/pump.js</h1>
+                        <h1 class="file-heading">File: src/__pipe/map.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -93,53 +93,92 @@ if (typeof define !== &#x27;function&#x27;) { var define = require(&#x27;amdefin
 define(function (require, exports, module) {
 	&#x27;use strict&#x27;;
 
-
 	var _ = require(&#x27;lodash&#x27;);
 
 
 	/**
-	 * SINGLE DESTINATION
+	 * Maps a single.
 	 *
-	 * @param  {[type]} value       [description]
+	 * @param  {[type]} src  [description]
 	 * @param  {[type]} dest [description]
-	 * @param  {[type]} properties  [description]
-	 * @return {[type]}             [description]
+	 * @param  {[type]} type [description]
+	 * @return {[type]}      [description]
 	 */
-	function pumpValue(value, dest, properties) {
+	function mapSingleAttribute(src, dest, direction) {
+
+		// force dest into array format
+		dest = _.isArray(dest) ? dest : [dest];
 
 
-		_.each(properties, function (prop) {
+		if (direction &amp;&amp; direction !== &#x27;both&#x27;) {
 
-			// [2.1.1.1] SET value onto DESTINATION
-			return this._destSet(dest, prop, value);
+			// specific map
+			this.maps[direction][src] = dest;
 
-		}, this);
+		} else {
+
+			// set map on both
+			this.maps.drain[src] = dest;
+			this.maps.pump[src]  = dest;
+		}
 	}
 
+
 	/**
-	 * Runs a single line
-	 * testing its matcher across all properties of the src object.
-	 *
-	 * [pumpPipe description]
-	 * @param  {[type]} def [description]
-	 * @return {Promise}     [description]
+	 * [map description]
+	 * @param  {[type]} name       [description]
+	 * @param  {[type]} definition [description]
+	 * @return {[type]}            [description]
 	 */
-	module.exports = function pumpPipeline(srcProp, destProps, force) {
+	exports.map = function mapAttribute() {
 
+		var src, dest;
 
-		var dest = this.dest;
+		if (_.isString(arguments[0])) {
 
+			// map
+			mapSingleAttribute.apply(this, arguments);
 
-		// [1] GET value from SOURCE
-		var value = this._srcGet(this.src, srcProp);
+		} else if (_.isObject(arguments[0])) {
+			// arguments = [{
+			// 		src: {
+			// 			dest: &#x27;destAttribute&#x27;,
+			// 			direction: &#x27;dual&#x27; || &#x27;drain&#x27; || &#x27;pump&#x27;
+			// 		},
+			// 		src: &#x27;destAttribute&#x27;  (direction = &#x27;dual&#x27;)
+			// }]
 
-		// [2] SET value
-		// [2.1] check if cached value is the same as current value
-		if (!this.isCached(srcProp, value) || force) {
+			_.each(arguments[0], function (destDef, src) {
 
-			// [2.2] pump values.
-			pumpValue.call(this, value, dest, destProps);
+				var dest, direction;
+
+				if (_.isString(destDef)) {
+					dest      = destDef;
+				} else {
+					dest      = destDef.dest;
+					direction = destDef.direction;
+				}
+
+				// invoke map method.
+				mapSingleAttribute.call(this, src, dest, direction);
+
+			}, this);
+
 		}
+
+		return this;
+	};
+
+	/**
+	 * [unmap description]
+	 * @param  {[type]} name [description]
+	 * @return {[type]}      [description]
+	 */
+	exports.unmap = function unmapAttribute(name) {
+		delete this._mapDrain[name];
+		delete this._mapPump[name];
+
+		return this;
 	};
 });
 

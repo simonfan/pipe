@@ -4,27 +4,6 @@
         "version": "0.0.0"
     },
     "files": {
-        "src/__pipe/streams/drain.js": {
-            "name": "src/__pipe/streams/drain.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
-        "src/__pipe/streams/index.js": {
-            "name": "src/__pipe/streams/index.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
-        "src/__pipe/streams/pump.js": {
-            "name": "src/__pipe/streams/pump.js",
-            "modules": {},
-            "classes": {},
-            "fors": {},
-            "namespaces": {}
-        },
         "src/__pipe/cache.js": {
             "name": "src/__pipe/cache.js",
             "modules": {},
@@ -32,8 +11,15 @@
             "fors": {},
             "namespaces": {}
         },
-        "src/__pipe/mapping.js": {
-            "name": "src/__pipe/mapping.js",
+        "src/__pipe/inject.js": {
+            "name": "src/__pipe/inject.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/__pipe/map.js": {
+            "name": "src/__pipe/map.js",
             "modules": {},
             "classes": {},
             "fors": {},
@@ -65,128 +51,6 @@
     "classes": {},
     "classitems": [
         {
-            "file": "src/__pipe/streams/drain.js",
-            "line": 11,
-            "description": "[drainPipeline description]",
-            "params": [
-                {
-                    "name": "srcProp",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "destProps",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/streams/index.js",
-            "line": 10,
-            "description": "runs action with lines.",
-            "params": [
-                {
-                    "name": "fn",
-                    "description": "[description]",
-                    "type": "Function"
-                },
-                {
-                    "name": "lines",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/streams/index.js",
-            "line": 35,
-            "description": "[exports description]",
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/streams/index.js",
-            "line": 41,
-            "description": "[drain description]",
-            "type": "{[type]}",
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/streams/index.js",
-            "line": 47,
-            "description": "Sets data onto src AND pumpes.",
-            "params": [
-                {
-                    "name": "data",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/streams/pump.js",
-            "line": 12,
-            "description": "SINGLE DESTINATION",
-            "params": [
-                {
-                    "name": "value",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "dest",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "properties",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/__pipe/streams/pump.js",
-            "line": 31,
-            "description": "Runs a single line\ntesting its matcher across all properties of the src object.\n\n[pumpPipe description]",
-            "params": [
-                {
-                    "name": "def",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "Promise"
-            },
-            "class": ""
-        },
-        {
             "file": "src/__pipe/cache.js",
             "line": 15,
             "description": "Does two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
@@ -209,8 +73,52 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/mapping.js",
+            "file": "src/__pipe/inject.js",
             "line": 10,
+            "description": "Sets data onto src AND pumpes.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/map.js",
+            "line": 11,
+            "description": "Maps a single.",
+            "params": [
+                {
+                    "name": "src",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "dest",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "type",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/map.js",
+            "line": 39,
             "description": "[map description]",
             "params": [
                 {
@@ -231,9 +139,9 @@
             "class": ""
         },
         {
-            "file": "src/__pipe/mapping.js",
-            "line": 44,
-            "description": "[removeLine description]",
+            "file": "src/__pipe/map.js",
+            "line": 84,
+            "description": "[unmap description]",
             "params": [
                 {
                     "name": "name",
@@ -273,44 +181,24 @@
     ],
     "warnings": [
         {
-            "message": "Missing item type\n[drainPipeline description]",
-            "line": " src/__pipe/streams/drain.js:11"
-        },
-        {
-            "message": "Missing item type\nruns action with lines.",
-            "line": " src/__pipe/streams/index.js:10"
-        },
-        {
-            "message": "Missing item type\n[exports description]",
-            "line": " src/__pipe/streams/index.js:35"
-        },
-        {
-            "message": "Missing item type\n[drain description]",
-            "line": " src/__pipe/streams/index.js:41"
-        },
-        {
-            "message": "Missing item type\nSets data onto src AND pumpes.",
-            "line": " src/__pipe/streams/index.js:47"
-        },
-        {
-            "message": "Missing item type\nSINGLE DESTINATION",
-            "line": " src/__pipe/streams/pump.js:12"
-        },
-        {
-            "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the src object.\n\n[pumpPipe description]",
-            "line": " src/__pipe/streams/pump.js:31"
-        },
-        {
             "message": "Missing item type\nDoes two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
             "line": " src/__pipe/cache.js:15"
         },
         {
-            "message": "Missing item type\n[map description]",
-            "line": " src/__pipe/mapping.js:10"
+            "message": "Missing item type\nSets data onto src AND pumpes.",
+            "line": " src/__pipe/inject.js:10"
         },
         {
-            "message": "Missing item type\n[removeLine description]",
-            "line": " src/__pipe/mapping.js:44"
+            "message": "Missing item type\nMaps a single.",
+            "line": " src/__pipe/map.js:11"
+        },
+        {
+            "message": "Missing item type\n[map description]",
+            "line": " src/__pipe/map.js:39"
+        },
+        {
+            "message": "Missing item type\n[unmap description]",
+            "line": " src/__pipe/map.js:84"
         },
         {
             "message": "Missing item type\n[initialize description]",
