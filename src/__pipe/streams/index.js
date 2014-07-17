@@ -45,23 +45,23 @@ define(function (require, exports, module) {
 	exports.drain = _.partial(streamPipeline, require('./drain'));
 
 	/**
-	 * Sets data onto source AND pumpes.
+	 * Sets data onto src AND pumpes.
 	 *
 	 * @param  {[type]} data [description]
 	 * @return {[type]}      [description]
 	 */
 	exports.inject = function inject(data, force) {
 
-		// [0] throw error if there is no source in the pipe object.
-		if (!this.source) {
-			throw new Error('No source for pipe');
+		// [0] throw error if there is no src in the pipe object.
+		if (!this.src) {
+			throw new Error('No src for pipe');
 		}
 
 		// [1] SET all data onto the SOURCE
 		_.each(data, function (value, key) {
 
 			if (!this.isCached(key, value) || force) {
-				this._srcSet(this.source, key, value);
+				this._srcSet(this.src, key, value);
 			}
 
 		}, this);

@@ -1,7 +1,7 @@
 {
   "name": "pipe",
   "main": "built/pipe.js",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Some module...",
   "dependencies": {
     "subject": "~0.5.8",
@@ -12,6 +12,7 @@
     "requirejs-text": "*",
     "underscore": "*",
     "jquery": "*",
-    "qunit": "*"
+    "qunit": "*",
+    "backbone": "~1.1.2"
   }
 }

@@ -14,7 +14,8 @@ require.config({
 		subject: '../bower_components/subject/built/subject',
 		underscore: '../bower_components/underscore/underscore',
 		q: '../bower_components/q/q',
-		'__pipe/auxiliary': '__pipe/auxiliary'
+		'__pipe/auxiliary': '__pipe/auxiliary',
+		backbone: '../bower_components/backbone/backbone'
 	},
 	shim: {
 		backbone: {

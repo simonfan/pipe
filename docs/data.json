@@ -25,6 +25,13 @@
             "fors": {},
             "namespaces": {}
         },
+        "src/__pipe/cache.js": {
+            "name": "src/__pipe/cache.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "src/__pipe/mapping.js": {
             "name": "src/__pipe/mapping.js",
             "modules": {},
@@ -121,7 +128,7 @@
         {
             "file": "src/__pipe/streams/index.js",
             "line": 47,
-            "description": "Sets data onto source AND pumpes.",
+            "description": "Sets data onto src AND pumpes.",
             "params": [
                 {
                     "name": "data",
@@ -146,7 +153,7 @@
                     "type": "[type]"
                 },
                 {
-                    "name": "destination",
+                    "name": "dest",
                     "description": "[description]",
                     "type": "[type]"
                 },
@@ -165,7 +172,7 @@
         {
             "file": "src/__pipe/streams/pump.js",
             "line": 31,
-            "description": "Runs a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
+            "description": "Runs a single line\ntesting its matcher across all properties of the src object.\n\n[pumpPipe description]",
             "params": [
                 {
                     "name": "def",
@@ -176,6 +183,28 @@
             "return": {
                 "description": "[description]",
                 "type": "Promise"
+            },
+            "class": ""
+        },
+        {
+            "file": "src/__pipe/cache.js",
+            "line": 15,
+            "description": "Does two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
+            "params": [
+                {
+                    "name": "property",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "value",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
             },
             "class": ""
         },
@@ -240,65 +269,6 @@
             },
             "class": "",
             "module": "pipe"
-        },
-        {
-            "file": "src/index.js",
-            "line": 92,
-            "description": "Does two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
-            "params": [
-                {
-                    "name": "property",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "value",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": "",
-            "module": "pipe"
-        },
-        {
-            "file": "src/index.js",
-            "line": 126,
-            "description": "Defines destination",
-            "params": [
-                {
-                    "name": "destination",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": "",
-            "module": "pipe"
-        },
-        {
-            "file": "src/index.js",
-            "line": 142,
-            "description": "Defines the source.",
-            "params": [
-                {
-                    "name": "source",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": "",
-            "module": "pipe"
         }
     ],
     "warnings": [
@@ -319,7 +289,7 @@
             "line": " src/__pipe/streams/index.js:41"
         },
         {
-            "message": "Missing item type\nSets data onto source AND pumpes.",
+            "message": "Missing item type\nSets data onto src AND pumpes.",
             "line": " src/__pipe/streams/index.js:47"
         },
         {
@@ -327,8 +297,12 @@
             "line": " src/__pipe/streams/pump.js:12"
         },
         {
-            "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the source object.\n\n[pumpPipe description]",
+            "message": "Missing item type\nRuns a single line\ntesting its matcher across all properties of the src object.\n\n[pumpPipe description]",
             "line": " src/__pipe/streams/pump.js:31"
+        },
+        {
+            "message": "Missing item type\nDoes two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
+            "line": " src/__pipe/cache.js:15"
         },
         {
             "message": "Missing item type\n[map description]",
@@ -341,18 +315,6 @@
         {
             "message": "Missing item type\n[initialize description]",
             "line": " src/index.js:27"
-        },
-        {
-            "message": "Missing item type\nDoes two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
-            "line": " src/index.js:92"
-        },
-        {
-            "message": "Missing item type\nDefines destination",
-            "line": " src/index.js:126"
-        },
-        {
-            "message": "Missing item type\nDefines the source.",
-            "line": " src/index.js:142"
         }
     ]
 }

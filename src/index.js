@@ -19,7 +19,7 @@ define(function (require, exports, module) {
 		_       = require('lodash');
 
 
-	var extensionOptionNames = ['srcGet', 'srcSet', 'destGet', 'destSet'];
+	var extensionOptionNames = ['get', 'set', 'srcGet', 'srcSet', 'destGet', 'destSet'];
 
 	var pipe = module.exports = subject({
 
@@ -50,12 +50,12 @@ define(function (require, exports, module) {
 				this.clearCache();
 			}
 
-			if (options.source) {
-				this.from(options.source);
+			if (options.from) {
+				this.from(options.from);
 			}
 
-			if (options.destination) {
-				this.to(options.destination);
+			if (options.to) {
+				this.to(options.to);
 			}
 
 			// object on which mappings will be stored.
@@ -73,90 +73,32 @@ define(function (require, exports, module) {
 			return object;
 		},
 
-	/*
-
+		/*
 		srcGet:
 		srcSet
 
 		destGet:
 		destSet:
-	*/
+		*/
 
-
-		clearCache: function clearCache() {
-			this.cache = {};
-
-			return this;
-		},
-
-		/**
-		 * Does two things:
-		 * [1] checks if the value is the same that is in cache
-		 * (and return at end of execution)
-		 * [2] if different, sets the value
-		 *
-		 * @param  {[type]} property [description]
-		 * @param  {[type]} value    [description]
-		 * @return {[type]}          [description]
-		 */
-		isCached: function isCached(property, value) {
-			if (!this.cache) {
-
-				// no cache, always return false
-				return false;
-
-			} else {
-
-				if (this.cache[property] !== value) {
-
-					// set cache value
-					this.cache[property] = value;
-
-					// value not in cache
-					return false;
-				} else {
-					// values are equal
-					// value in cache
-					return true;
-				}
-			}
-
-		},
-
-		/**
-		 * Defines destination
-		 *
-		 * @param  {[type]} destination [description]
-		 * @return {[type]}             [description]
-		 */
-		to: function pipeTo(destination) {
-			this.clearCache();
-
-			this.destination = destination;
-
-			return this;
-		},
-
-
-
-		/**
-		 * Defines the source.
-		 *
-		 * @param  {[type]} source [description]
-		 * @return {[type]}        [description]
-		 */
-		from: function pipeFrom(source) {
+		from: function pipeFrom(src) {
 			// restart cache
 			this.clearCache();
-
-			this.source = source;
-
+			// set
+			this.src = src;
 			return this;
 		},
 
+		to: function pipeTo(dest) {
+			this.clearCache();
+			// set
+			this.dest = dest;
+			return this;
+		},
 	});
 
 	// prototype
 	pipe.assignProto(require('./__pipe/streams/index'))
-		.assignProto(require('./__pipe/mapping'));
+		.assignProto(require('./__pipe/mapping'))
+		.assignProto(require('./__pipe/cache'));
 });
