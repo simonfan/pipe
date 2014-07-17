@@ -20,13 +20,13 @@
 	'use strict';
 
 	describe('pipe single-directional-mapping', function () {
-		it('pump only', function () {
+		it('ok :)', function () {
 
 			// pipe
 			var p = pipe({
-				keyA: { dest: 'destKeyA', direction: 'drain' },
+				keyA: { dest: 'destKeyA', direction: 'from' },
 				keyB: { dest: 'destKeyB', direction: 'both' },
-				keyC: { dest: 'destKeyC', direction: 'pump' },
+				keyC: { dest: 'destKeyC', direction: 'to' },
 			});
 
 			// define endpoints
@@ -60,6 +60,49 @@
 			src.keyB.should.eql('destValueB');	// keyB is both
 			src.keyC.should.eql('srcValueC');	// keyC is pump only
 
+		});
+
+		it('object notation', function () {
+			var p = pipe();
+
+			p.map({
+				keyA: 'destKeyA',
+				keyB: 'destKeyB',
+			}, 'to');
+
+			p.map({
+				keyC: 'destKeyC',
+				keyD: 'destKeyD',
+			}, 'from');
+
+			var src = {
+					keyA: 'srcA',
+					keyB: 'srcB',
+					keyC: 'srcC',
+					keyD: 'srcD'
+				},
+				dest = {
+					destKeyA: 'destA',
+					destKeyB: 'destB',
+					destKeyC: 'destC',
+					destKeyD: 'destD'
+				};
+
+			p.from(src).to(dest);
+
+			p.pump();
+
+			dest.destKeyA.should.eql('srcA');	// to
+			dest.destKeyB.should.eql('srcB');	// to
+			dest.destKeyC.should.eql('destC');	// from (unaltered by pump)
+			dest.destKeyD.should.eql('destD');	// from (unaltered by pump)
+
+			p.drain();
+
+			src.keyA.should.eql('srcA');	// to (unaltered by drain)
+			src.keyB.should.eql('srcB');	// to (unaltered by drain)
+			src.keyC.should.eql('destC');	// from
+			src.keyD.should.eql('destD');	// from
 		});
 	});
 });

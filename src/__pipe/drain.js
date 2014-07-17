@@ -10,7 +10,7 @@ define(function (require, exports, module) {
 	exports.drain = function drain(properties, force) {
 
 		// [1] keep properties in cache.
-		var map  = this.maps.drain,
+		var map  = this.maps.from,
 			src  = this.src,
 			dest = this.dest;
 

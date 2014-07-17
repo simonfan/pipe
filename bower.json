@@ -1,7 +1,7 @@
 {
   "name": "pipe",
   "main": "built/pipe.js",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Some module...",
   "dependencies": {
     "subject": "~0.5.8",

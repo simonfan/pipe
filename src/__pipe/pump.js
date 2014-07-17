@@ -10,7 +10,7 @@ define(function (require, exports, module) {
 
 	exports.pump = function pump(properties, force) {
 		// [1] keep properties in cache.
-		var map  = this.maps.pump,
+		var map  = this.maps.to,
 			src  = this.src,
 			dest = this.dest;
 

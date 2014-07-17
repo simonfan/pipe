@@ -10,7 +10,7 @@ define('__pipe/pump',['require','exports','module','lodash'],function (require, 
 
 	exports.pump = function pump(properties, force) {
 		// [1] keep properties in cache.
-		var map  = this.maps.pump,
+		var map  = this.maps.to,
 			src  = this.src,
 			dest = this.dest;
 
@@ -54,7 +54,7 @@ define('__pipe/drain',['require','exports','module','lodash'],function (require,
 	exports.drain = function drain(properties, force) {
 
 		// [1] keep properties in cache.
-		var map  = this.maps.drain,
+		var map  = this.maps.from,
 			src  = this.src,
 			dest = this.dest;
 
@@ -142,7 +142,6 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 		// force dest into array format
 		dest = _.isArray(dest) ? dest : [dest];
 
-
 		if (direction && direction !== 'both') {
 
 			// specific map
@@ -151,8 +150,8 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 		} else {
 
 			// set map on both
-			this.maps.drain[src] = dest;
-			this.maps.pump[src]  = dest;
+			this.maps.to[src]    = dest;
+			this.maps.from[src]  = dest;
 		}
 	}
 
@@ -164,8 +163,6 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 	 * @return {[type]}            [description]
 	 */
 	exports.map = function mapAttribute() {
-
-		var src, dest;
 
 		if (_.isString(arguments[0])) {
 
@@ -181,15 +178,17 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 			// 		src: 'destAttribute'  (direction = 'dual')
 			// }]
 
+			var direction = arguments[1];
+
 			_.each(arguments[0], function (destDef, src) {
 
-				var dest, direction;
+				var dest;
 
 				if (_.isString(destDef)) {
 					dest      = destDef;
 				} else {
 					dest      = destDef.dest;
-					direction = destDef.direction;
+					direction = destDef.direction || direction;
 				}
 
 				// invoke map method.
@@ -208,8 +207,9 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 	 * @return {[type]}      [description]
 	 */
 	exports.unmap = function unmapAttribute(name) {
-		delete this._mapDrain[name];
-		delete this._mapPump[name];
+		_.each(this.maps, function (map) {
+			delete map[name];
+		});
 
 		return this;
 	};
@@ -326,8 +326,8 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/pump','
 
 			// object on which mappings will be stored.
 			this.maps = {
-				drain: {},
-				pump : {}
+				from: {},
+				to  : {}
 			};
 			this.map(mappings);
 		},

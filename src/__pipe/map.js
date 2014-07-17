@@ -21,7 +21,6 @@ define(function (require, exports, module) {
 		// force dest into array format
 		dest = _.isArray(dest) ? dest : [dest];
 
-
 		if (direction && direction !== 'both') {
 
 			// specific map
@@ -30,8 +29,8 @@ define(function (require, exports, module) {
 		} else {
 
 			// set map on both
-			this.maps.drain[src] = dest;
-			this.maps.pump[src]  = dest;
+			this.maps.to[src]    = dest;
+			this.maps.from[src]  = dest;
 		}
 	}
 
@@ -43,8 +42,6 @@ define(function (require, exports, module) {
 	 * @return {[type]}            [description]
 	 */
 	exports.map = function mapAttribute() {
-
-		var src, dest;
 
 		if (_.isString(arguments[0])) {
 
@@ -60,15 +57,17 @@ define(function (require, exports, module) {
 			// 		src: 'destAttribute'  (direction = 'dual')
 			// }]
 
+			var direction = arguments[1];
+
 			_.each(arguments[0], function (destDef, src) {
 
-				var dest, direction;
+				var dest;
 
 				if (_.isString(destDef)) {
 					dest      = destDef;
 				} else {
 					dest      = destDef.dest;
-					direction = destDef.direction;
+					direction = destDef.direction || direction;
 				}
 
 				// invoke map method.
@@ -87,8 +86,9 @@ define(function (require, exports, module) {
 	 * @return {[type]}      [description]
 	 */
 	exports.unmap = function unmapAttribute(name) {
-		delete this._mapDrain[name];
-		delete this._mapPump[name];
+		_.each(this.maps, function (map) {
+			delete map[name];
+		});
 
 		return this;
 	};
