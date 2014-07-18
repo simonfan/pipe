@@ -50,6 +50,15 @@ define(function (require, exports, module) {
 				this.clearCache();
 			}
 
+
+
+
+			// object on which mappings will be stored.
+			this.maps = {
+				from: {},
+				to  : {}
+			};
+
 			if (options.from) {
 				this.from(options.from);
 			}
@@ -57,12 +66,6 @@ define(function (require, exports, module) {
 			if (options.to) {
 				this.to(options.to);
 			}
-
-			// object on which mappings will be stored.
-			this.maps = {
-				from: {},
-				to  : {}
-			};
 			this.map(mappings);
 		},
 

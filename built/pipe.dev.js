@@ -316,6 +316,15 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/pump','
 				this.clearCache();
 			}
 
+
+
+
+			// object on which mappings will be stored.
+			this.maps = {
+				from: {},
+				to  : {}
+			};
+
 			if (options.from) {
 				this.from(options.from);
 			}
@@ -323,12 +332,6 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/pump','
 			if (options.to) {
 				this.to(options.to);
 			}
-
-			// object on which mappings will be stored.
-			this.maps = {
-				from: {},
-				to  : {}
-			};
 			this.map(mappings);
 		},
 
