@@ -137,7 +137,7 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 	 * @param  {[type]} type [description]
 	 * @return {[type]}      [description]
 	 */
-	function mapSingleAttribute(src, dest, direction) {
+	exports.mapSingle = function mapSingleAttribute(src, dest, direction) {
 
 		// force dest into array format
 		dest = _.isArray(dest) ? dest : [dest];
@@ -153,7 +153,7 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 			this.maps.to[src]    = dest;
 			this.maps.from[src]  = dest;
 		}
-	}
+	};
 
 
 	/**
@@ -167,7 +167,7 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 		if (_.isString(arguments[0])) {
 
 			// map
-			mapSingleAttribute.apply(this, arguments);
+			this.mapSingle.apply(this, arguments);
 
 		} else if (_.isObject(arguments[0])) {
 			// arguments = [{
@@ -192,7 +192,7 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 				}
 
 				// invoke map method.
-				mapSingleAttribute.call(this, src, dest, direction);
+				this.mapSingle(src, dest, direction);
 
 			}, this);
 

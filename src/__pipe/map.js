@@ -16,7 +16,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]} type [description]
 	 * @return {[type]}      [description]
 	 */
-	function mapSingleAttribute(src, dest, direction) {
+	exports.mapSingle = function mapSingleAttribute(src, dest, direction) {
 
 		// force dest into array format
 		dest = _.isArray(dest) ? dest : [dest];
@@ -32,7 +32,7 @@ define(function (require, exports, module) {
 			this.maps.to[src]    = dest;
 			this.maps.from[src]  = dest;
 		}
-	}
+	};
 
 
 	/**
@@ -46,7 +46,7 @@ define(function (require, exports, module) {
 		if (_.isString(arguments[0])) {
 
 			// map
-			mapSingleAttribute.apply(this, arguments);
+			this.mapSingle.apply(this, arguments);
 
 		} else if (_.isObject(arguments[0])) {
 			// arguments = [{
@@ -71,7 +71,7 @@ define(function (require, exports, module) {
 				}
 
 				// invoke map method.
-				mapSingleAttribute.call(this, src, dest, direction);
+				this.mapSingle(src, dest, direction);
 
 			}, this);
 
