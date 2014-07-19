@@ -8,7 +8,7 @@ define(function (require, exports, module) {
 	var _ = require('lodash');
 
 
-	exports.pump = function pump(properties, force) {
+	exports.pump = function pump(properties, options) {
 		// [1] keep properties in cache.
 		var map  = this.maps.to,
 			src  = this.src,
@@ -22,19 +22,23 @@ define(function (require, exports, module) {
 		_.each(properties, function (destProps, srcProp) {
 
 			// [3.1] GET value from SOURCE
-			var value = this._srcGet(src, srcProp);
+			var value = this.srcGet(src, srcProp);
 
-			// [3.2] SET value
-			// [3.2.1] check if cached value is the same as current value
-			if (!this.isCached(srcProp, value) || force) {
+			// [3.2.2] pump values.
+			_.each(destProps, function (destProp) {
 
-				// [3.2.2] pump values.
-				_.each(destProps, function (prop) {
 
-					return this._destSet(dest, prop, value);
+				// [3.2] SET value
+				// [3.2.1] check if cached value is the same as current value
+				if (!this.cacheCheck('dest', destProp, value) || (options && options.force)) {
 
-				}, this);
-			}
+
+					this.destSet(dest, destProp, value);
+
+					this.cacheSet('dest', destProp, value);
+				}
+
+			}, this);
 
 
 		}, this);

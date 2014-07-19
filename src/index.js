@@ -18,55 +18,39 @@ define(function (require, exports, module) {
 	var subject = require('subject'),
 		_       = require('lodash');
 
-
-	var extensionOptionNames = ['get', 'set', 'srcGet', 'srcSet', 'destGet', 'destSet'];
-
 	var pipe = module.exports = subject({
 
 
 		/**
 		 * [initialize description]
-		 * @param  {[type]} mappings [description]
+		 * @param  {[type]} map [description]
 		 * @param  {[type]} options   [description]
 		 * @return {[type]}           [description]
 		 */
-		initialize: function initialize(mappings, options) {
+		initialize: function initialize(src, dest, map, options) {
 
 			options = options || {};
 
-			// some default options
-			_.each(extensionOptionNames, function (opt) {
-				this[opt] = options[opt] || this[opt];
-			}, this);
-
-			// _*get and _*set methods.
-			this._srcGet = this.srcGet || this.get;
-			this._srcSet = this.srcSet || this.set;
-			this._destGet = this.destGet || this.get;
-			this._destSet = this.destSet || this.set;
+			// getters and setters
+			this.srcGet  = this.srcGet  || this.get;
+			this.srcSet  = this.srcSet  || this.set;
+			this.destGet = this.destGet || this.get;
+			this.destSet = this.destSet || this.set;
 
 			// the cache. if set to false, no cache will be used.
 			if (options.cache !== false) {
-				this.clearCache();
+				this.cacheClear();
 			}
 
-
-
-
-			// object on which mappings will be stored.
+			// object on which map will be stored.
 			this.maps = {
 				from: {},
 				to  : {}
 			};
 
-			if (options.from) {
-				this.from(options.from);
-			}
-
-			if (options.to) {
-				this.to(options.to);
-			}
-			this.map(mappings);
+			if (src) { this.from(src); }
+			if (dest) { this.to(dest); }
+			if (map) { this.map(map, options.direction); }
 		},
 
 		get: function pipeGet(object, property) {
@@ -89,14 +73,14 @@ define(function (require, exports, module) {
 
 		from: function pipeFrom(src) {
 			// restart cache
-			this.clearCache();
+			this.cacheClear();
 			// set
 			this.src = src;
 			return this;
 		},
 
 		to: function pipeTo(dest) {
-			this.clearCache();
+			this.cacheClear();
 			// set
 			this.dest = dest;
 			return this;

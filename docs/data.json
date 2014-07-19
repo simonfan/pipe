@@ -157,11 +157,11 @@
         },
         {
             "file": "src/index.js",
-            "line": 27,
+            "line": 24,
             "description": "[initialize description]",
             "params": [
                 {
-                    "name": "mappings",
+                    "name": "map",
                     "description": "[description]",
                     "type": "[type]"
                 },
@@ -202,7 +202,7 @@
         },
         {
             "message": "Missing item type\n[initialize description]",
-            "line": " src/index.js:27"
+            "line": " src/index.js:24"
         }
     ]
 }

@@ -79,12 +79,10 @@
 			})
 
 			// instantiate the pipe
-			this.pipe = pipeline({
+			this.pipe = pipeline(source, destination, {
 				key1: 'destKey1',
 				key2: 'destKey2'
-			})
-			.from(source)
-			.to(destination);
+			});
 		});
 
 		it('drains', function () {

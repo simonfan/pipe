@@ -33,12 +33,10 @@
 					key2: 'source-2-v2'
 				};
 
-			var p = pipe({
+			var p = pipe(source1, destination, {
 				key1: 'dest-key1',
 				key2: 'dest-key2',
-			})
-			.from(source1)
-			.to(destination);
+			});
 
 
 			p.pump();

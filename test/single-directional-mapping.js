@@ -22,12 +22,6 @@
 	describe('pipe single-directional-mapping', function () {
 		it('ok :)', function () {
 
-			// pipe
-			var p = pipe({
-				keyA: { dest: 'destKeyA', direction: 'from' },
-				keyB: { dest: 'destKeyB', direction: 'both' },
-				keyC: { dest: 'destKeyC', direction: 'to' },
-			});
 
 			// define endpoints
 			var src  = {
@@ -37,7 +31,14 @@
 				},
 				dest = {};
 
-			p.from(src).to(dest);
+
+
+			// pipe
+			var p = pipe(src, dest, {
+				keyA: { dest: 'destKeyA', direction: 'from' },
+				keyB: { dest: 'destKeyB', direction: 'both' },
+				keyC: { dest: 'destKeyC', direction: 'to' },
+			});
 
 			// pump data
 			p.pump();

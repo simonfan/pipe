@@ -50,13 +50,11 @@
 
 			// instantiate
 			// pipe(actions, options {source, destination, cache})
-			var dataPipe = dpipe({
+			var dataPipe = dpipe(source, destination, {
 
 				sourceK1: 'm1',
 				sourceK2: 'm2',
-			})
-			.from(source)
-			.to(destination);
+			});
 
 			// set some data on source
 			source.sourceK1 = 'value-1';

@@ -29,12 +29,10 @@
 			source.key1 = 'v1';
 			source.key2 = 'v2';
 
-			var p = pipe({
+			var p = pipe(source, destination, {
 				key1: 'destKey1',
 				key2: 'destKey2'
-			})
-			.from(source)
-			.to(destination);
+			});
 
 			p.pump();
 

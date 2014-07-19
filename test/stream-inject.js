@@ -43,12 +43,10 @@
 			})
 
 
-			var dataPipe = dpipe({
+			var dataPipe = dpipe(source, destination, {
 				keyA: 'set:destKeyA',
 				keyB: 'set:destKeyB',
-			})
-			.from(source)
-			.to(destination);
+			});
 
 			dataPipe.inject({
 				keyA: 'valueA',

@@ -13,7 +13,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]} data [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.inject = function inject(data, force) {
+	exports.inject = function inject(data, options) {
 
 		// [0] throw error if there is no src in the pipe object.
 		if (!this.src) {
@@ -23,13 +23,13 @@ define(function (require, exports, module) {
 		// [1] SET all data onto the SOURCE
 		_.each(data, function (value, key) {
 
-			if (!this.isCached(key, value) || force) {
-				this._srcSet(this.src, key, value);
+			if (!this.isCached(key, value) || (options && options.force)) {
+				this.srcSet(this.src, key, value);
 			}
 
 		}, this);
 
-		// [2] pump data (no specific pipelines, force = true)
-		this.pump(null, true);
+		// [2] pump data (no specific pipelines, options = true)
+		this.pump(null, { force: true });
 	};
 });
