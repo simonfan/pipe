@@ -52,7 +52,7 @@
     "classitems": [
         {
             "file": "src/__pipe/cache.js",
-            "line": 15,
+            "line": 22,
             "description": "Does two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
             "params": [
                 {
@@ -182,7 +182,7 @@
     "warnings": [
         {
             "message": "Missing item type\nDoes two things:\n[1] checks if the value is the same that is in cache\n(and return at end of execution)\n[2] if different, sets the value",
-            "line": " src/__pipe/cache.js:15"
+            "line": " src/__pipe/cache.js:22"
         },
         {
             "message": "Missing item type\nSets data onto src AND pumpes.",

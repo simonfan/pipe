@@ -18,6 +18,8 @@ define(function (require, exports, module) {
 		//     defaults to ALL
 		properties = properties ? _.pick(map, properties) : map;
 
+		var force = (options && options.force);
+
 		// [3]
 		_.each(properties, function (destProps, srcProp) {
 
@@ -30,12 +32,13 @@ define(function (require, exports, module) {
 
 				// [3.2] SET value
 				// [3.2.1] check if cached value is the same as current value
-				if (!this.cacheCheck('dest', destProp, value) || (options && options.force)) {
+				//         in cache checks always use the src prop.
+				if (force || !this.cacheCheck(srcProp, value)) {
 
 
 					this.destSet(dest, destProp, value);
 
-					this.cacheSet('dest', destProp, value);
+					// this.cacheSet('dest', destProp, value);
 				}
 
 			}, this);

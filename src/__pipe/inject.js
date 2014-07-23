@@ -23,7 +23,7 @@ define(function (require, exports, module) {
 		// [1] SET all data onto the SOURCE
 		_.each(data, function (value, key) {
 
-			if (!this.isCached(key, value) || (options && options.force)) {
+			if (!this.cacheCheck(key, value) || (options && options.force)) {
 				this.srcSet(this.src, key, value);
 			}
 

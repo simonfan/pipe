@@ -12,6 +12,13 @@ define(function (require, exports, module) {
 	// 	return this;
 	// };
 
+
+	exports.cacheClear = function cacheClear() {
+		this.cache = {};
+
+		return this;
+	};
+
 	/**
 	 * Does two things:
 	 * [1] checks if the value is the same that is in cache
@@ -22,7 +29,7 @@ define(function (require, exports, module) {
 	 * @param  {[type]} value    [description]
 	 * @return {[type]}          [description]
 	 */
-	exports.isCached = function isCached(property, value) {
+	exports.cacheCheck = function cacheCheck(property, value) {
 		if (!this.cache) {
 
 			// no cache, always return false
@@ -47,56 +54,56 @@ define(function (require, exports, module) {
 
 
 
-	exports.cacheGet = function cacheGet(namespace, property) {
-		return this.cache[namespace][property];
-	};
+	// exports.cacheGet = function cacheGet(namespace, property) {
+	// 	return this.cache[namespace][property];
+	// };
 
-	exports.cacheSet = function cacheSet(namespace, property, value) {
+	// exports.cacheSet = function cacheSet(namespace, property, value) {
 
-		this.cache[namespace][property] = value;
+	// 	this.cache[namespace][property] = value;
 
-		return this;
-	};
+	// 	return this;
+	// };
 
-	exports.cacheCheck = function cacheCheck(namespace, property, value) {
+	// exports.cacheCheck = function cacheCheck(namespace, property, value) {
 
-		if (this.cache === false) {
-			// no cache.
-			// always return false on checks.
-			return false;
-		}
+	// 	if (this.cache === false) {
+	// 		// no cache.
+	// 		// always return false on checks.
+	// 		return false;
+	// 	}
 
-		return this.cacheGet(namespace, property) === value;
+	// 	return this.cacheGet(namespace, property) === value;
 
-	};
+	// };
 
-	exports.cacheClear = function cacheClear(namespace, properties) {
-		if (arguments.length === 0) {
-			// full clear.
-			this.cache = {
-				src: {},
-				dest: {}
-			};
+	// exports.cacheClear = function cacheClear(namespace, properties) {
+	// 	if (arguments.length === 0) {
+	// 		// full clear.
+	// 		this.cache = {
+	// 			src: {},
+	// 			dest: {}
+	// 		};
 
-		} else if (arguments.length === 1) {
-			// arguments: [namespace]
-			this.cache[namespace] === {};
+	// 	} else if (arguments.length === 1) {
+	// 		// arguments: [namespace]
+	// 		this.cache[namespace] === {};
 
-		} else {
-			// arguments: [namespace, propertyOrProperties]
+	// 	} else {
+	// 		// arguments: [namespace, propertyOrProperties]
 
-			// properties must be array
-			properties = _.isArray(properties) ? properties : [properties];
+	// 		// properties must be array
+	// 		properties = _.isArray(properties) ? properties : [properties];
 
-			// direct reference to the cache obj
-			var cache = this.cache[namespace];
+	// 		// direct reference to the cache obj
+	// 		var cache = this.cache[namespace];
 
-			_.each(properties, function (property) {
-				delete cache[property]
-			}, this);
-		}
+	// 		_.each(properties, function (property) {
+	// 			delete cache[property]
+	// 		}, this);
+	// 	}
 
-		return this;
-	};
+	// 	return this;
+	// };
 
 });

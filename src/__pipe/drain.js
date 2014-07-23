@@ -54,12 +54,12 @@ define(function (require, exports, module) {
 			var value = this.destGet(this.dest, destProps[0]);
 
 			// [2] check cache
-			if (force || !this.cacheCheck('src', srcProp, value)) {
+			if (force || !this.cacheCheck(srcProp, value)) {
 				// [2.1] SET value onto SOURCE
 				this.srcSet(this.src, srcProp, value);
 
-				// [2.2] SET value onto source cache
-				this.cacheSet('src', srcProp, value);
+				// // [2.2] SET value onto source cache
+				// this.cacheSet('src', srcProp, value);
 			}
 
 		}, this);

@@ -18,6 +18,8 @@ define('__pipe/pump',['require','exports','module','lodash'],function (require, 
 		//     defaults to ALL
 		properties = properties ? _.pick(map, properties) : map;
 
+		var force = (options && options.force);
+
 		// [3]
 		_.each(properties, function (destProps, srcProp) {
 
@@ -30,12 +32,13 @@ define('__pipe/pump',['require','exports','module','lodash'],function (require, 
 
 				// [3.2] SET value
 				// [3.2.1] check if cached value is the same as current value
-				if (!this.cacheCheck('dest', destProp, value) || (options && options.force)) {
+				//         in cache checks always use the src prop.
+				if (force || !this.cacheCheck(srcProp, value)) {
 
 
 					this.destSet(dest, destProp, value);
 
-					this.cacheSet('dest', destProp, value);
+					// this.cacheSet('dest', destProp, value);
 				}
 
 			}, this);
@@ -102,12 +105,12 @@ define('__pipe/drain',['require','exports','module','lodash'],function (require,
 			var value = this.destGet(this.dest, destProps[0]);
 
 			// [2] check cache
-			if (force || !this.cacheCheck('src', srcProp, value)) {
+			if (force || !this.cacheCheck(srcProp, value)) {
 				// [2.1] SET value onto SOURCE
 				this.srcSet(this.src, srcProp, value);
 
-				// [2.2] SET value onto source cache
-				this.cacheSet('src', srcProp, value);
+				// // [2.2] SET value onto source cache
+				// this.cacheSet('src', srcProp, value);
 			}
 
 		}, this);
@@ -143,7 +146,7 @@ define('__pipe/inject',['require','exports','module','lodash'],function (require
 		// [1] SET all data onto the SOURCE
 		_.each(data, function (value, key) {
 
-			if (!this.isCached(key, value) || (options && options.force)) {
+			if (!this.cacheCheck(key, value) || (options && options.force)) {
 				this.srcSet(this.src, key, value);
 			}
 
@@ -264,6 +267,13 @@ define('__pipe/cache',['require','exports','module'],function (require, exports,
 	// 	return this;
 	// };
 
+
+	exports.cacheClear = function cacheClear() {
+		this.cache = {};
+
+		return this;
+	};
+
 	/**
 	 * Does two things:
 	 * [1] checks if the value is the same that is in cache
@@ -274,7 +284,7 @@ define('__pipe/cache',['require','exports','module'],function (require, exports,
 	 * @param  {[type]} value    [description]
 	 * @return {[type]}          [description]
 	 */
-	exports.isCached = function isCached(property, value) {
+	exports.cacheCheck = function cacheCheck(property, value) {
 		if (!this.cache) {
 
 			// no cache, always return false
@@ -299,57 +309,57 @@ define('__pipe/cache',['require','exports','module'],function (require, exports,
 
 
 
-	exports.cacheGet = function cacheGet(namespace, property) {
-		return this.cache[namespace][property];
-	};
+	// exports.cacheGet = function cacheGet(namespace, property) {
+	// 	return this.cache[namespace][property];
+	// };
 
-	exports.cacheSet = function cacheSet(namespace, property, value) {
+	// exports.cacheSet = function cacheSet(namespace, property, value) {
 
-		this.cache[namespace][property] = value;
+	// 	this.cache[namespace][property] = value;
 
-		return this;
-	};
+	// 	return this;
+	// };
 
-	exports.cacheCheck = function cacheCheck(namespace, property, value) {
+	// exports.cacheCheck = function cacheCheck(namespace, property, value) {
 
-		if (this.cache === false) {
-			// no cache.
-			// always return false on checks.
-			return false;
-		}
+	// 	if (this.cache === false) {
+	// 		// no cache.
+	// 		// always return false on checks.
+	// 		return false;
+	// 	}
 
-		return this.cacheGet(namespace, property) === value;
+	// 	return this.cacheGet(namespace, property) === value;
 
-	};
+	// };
 
-	exports.cacheClear = function cacheClear(namespace, properties) {
-		if (arguments.length === 0) {
-			// full clear.
-			this.cache = {
-				src: {},
-				dest: {}
-			};
+	// exports.cacheClear = function cacheClear(namespace, properties) {
+	// 	if (arguments.length === 0) {
+	// 		// full clear.
+	// 		this.cache = {
+	// 			src: {},
+	// 			dest: {}
+	// 		};
 
-		} else if (arguments.length === 1) {
-			// arguments: [namespace]
-			this.cache[namespace] === {};
+	// 	} else if (arguments.length === 1) {
+	// 		// arguments: [namespace]
+	// 		this.cache[namespace] === {};
 
-		} else {
-			// arguments: [namespace, propertyOrProperties]
+	// 	} else {
+	// 		// arguments: [namespace, propertyOrProperties]
 
-			// properties must be array
-			properties = _.isArray(properties) ? properties : [properties];
+	// 		// properties must be array
+	// 		properties = _.isArray(properties) ? properties : [properties];
 
-			// direct reference to the cache obj
-			var cache = this.cache[namespace];
+	// 		// direct reference to the cache obj
+	// 		var cache = this.cache[namespace];
 
-			_.each(properties, function (property) {
-				delete cache[property]
-			}, this);
-		}
+	// 		_.each(properties, function (property) {
+	// 			delete cache[property]
+	// 		}, this);
+	// 	}
 
-		return this;
-	};
+	// 	return this;
+	// };
 
 });
 
