@@ -106,13 +106,8 @@ define(function (require, exports, module) {
 	 */
 	function mapSingle(src, destKey, options) {
 
-		options = options || {};
-
-		if (_.isString(options)) {
-			options = {};
-			options.direction = arguments[2];
-		}
-		var direction = options.direction || &#x27;both&#x27;;
+		// grab direction
+		var direction = (options &amp;&amp; options.direction) ? options.direction : &#x27;both&#x27;;
 
 		// force destKey into array format
 		destKey = _.isArray(destKey) ? destKey : [destKey];

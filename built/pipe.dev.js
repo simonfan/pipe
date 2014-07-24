@@ -177,13 +177,8 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 	 */
 	function mapSingle(src, destKey, options) {
 
-		options = options || {};
-
-		if (_.isString(options)) {
-			options = {};
-			options.direction = arguments[2];
-		}
-		var direction = options.direction || 'both';
+		// grab direction
+		var direction = (options && options.direction) ? options.direction : 'both';
 
 		// force destKey into array format
 		destKey = _.isArray(destKey) ? destKey : [destKey];

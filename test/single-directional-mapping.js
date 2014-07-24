@@ -37,7 +37,7 @@
 			var p = pipe(src, dest);
 
 			p
-			.map('keyA', 'destKeyA', 'from')
+			.map('keyA', 'destKeyA', { direction: 'from' })
 			.map('keyB', 'destKeyB', { direction: 'both' })
 			.map({ keyC: 'destKeyC'}, { direction: 'to' });
 
@@ -70,12 +70,12 @@
 			p.map({
 				keyA: 'destKeyA',
 				keyB: 'destKeyB',
-			}, 'to');
+			}, { direction: 'to' });
 
 			p.map({
 				keyC: 'destKeyC',
 				keyD: 'destKeyD',
-			}, 'from');
+			}, { direction: 'from' });
 
 			var src = {
 					keyA: 'srcA',

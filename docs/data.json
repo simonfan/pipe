@@ -118,7 +118,7 @@
         },
         {
             "file": "src/__pipe/map.js",
-            "line": 45,
+            "line": 40,
             "description": "[map description]",
             "params": [
                 {
@@ -140,7 +140,7 @@
         },
         {
             "file": "src/__pipe/map.js",
-            "line": 77,
+            "line": 72,
             "description": "[unmap description]",
             "params": [
                 {
@@ -194,11 +194,11 @@
         },
         {
             "message": "Missing item type\n[map description]",
-            "line": " src/__pipe/map.js:45"
+            "line": " src/__pipe/map.js:40"
         },
         {
             "message": "Missing item type\n[unmap description]",
-            "line": " src/__pipe/map.js:77"
+            "line": " src/__pipe/map.js:72"
         },
         {
             "message": "Missing item type\n[initialize description]",
