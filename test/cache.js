@@ -43,7 +43,7 @@
 				k1: 'destK1',
 				k2: 'destK2',
 				k3: 'destK3'
-			}, 'from');
+			}, { direction: 'from' });
 
 			p.pump();
 

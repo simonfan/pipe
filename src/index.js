@@ -50,7 +50,7 @@ define(function (require, exports, module) {
 
 			if (src) { this.from(src); }
 			if (dest) { this.to(dest); }
-			if (map) { this.map(map, options.direction); }
+			if (map) { this.map(map, options); }
 		},
 
 		get: function pipeGet(object, property) {

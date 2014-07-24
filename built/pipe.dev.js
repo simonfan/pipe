@@ -175,24 +175,31 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 	 * @param  {[type]} type [description]
 	 * @return {[type]}      [description]
 	 */
-	exports.mapSingle = function mapSingleAttribute(src, dest, direction) {
+	function mapSingle(src, destKey, options) {
 
-		// force dest into array format
-		dest = _.isArray(dest) ? dest : [dest];
+		options = options || {};
+
+		if (_.isString(options)) {
+			options = {};
+			options.direction = arguments[2];
+		}
+		var direction = options.direction || 'both';
+
+		// force destKey into array format
+		destKey = _.isArray(destKey) ? destKey : [destKey];
 
 		if (direction && direction !== 'both') {
 
 			// specific map
-			this.maps[direction][src] = dest;
+			this.maps[direction][src] = destKey;
 
 		} else {
 
 			// set map on both
-			this.maps.to[src]    = dest;
-			this.maps.from[src]  = dest;
+			this.maps.to[src]    = destKey;
+			this.maps.from[src]  = destKey;
 		}
 	};
-
 
 	/**
 	 * [map description]
@@ -200,40 +207,27 @@ define('__pipe/map',['require','exports','module','lodash'],function (require, e
 	 * @param  {[type]} definition [description]
 	 * @return {[type]}            [description]
 	 */
-	exports.map = function mapAttribute() {
+	exports.map = function mapAttrs() {
 
+		// args
+		var args = _.toArray(arguments);
+
+		// parse out options
 		if (_.isString(arguments[0])) {
 
 			// map
-			this.mapSingle.apply(this, arguments);
+			mapSingle.apply(this, args);
 
 		} else if (_.isObject(arguments[0])) {
-			// arguments = [{
-			// 		src: {
-			// 			dest: 'destAttribute',
-			// 			direction: 'dual' || 'drain' || 'pump'
-			// 		},
-			// 		src: 'destAttribute'  (direction = 'dual')
-			// }]
 
-			var direction = arguments[1];
+			var options = arguments[1];
 
-			_.each(arguments[0], function (destDef, src) {
-
-				var dest;
-
-				if (_.isString(destDef)) {
-					dest      = destDef;
-				} else {
-					dest      = destDef.dest;
-					direction = destDef.direction || direction;
-				}
-
-				// invoke map method.
-				this.mapSingle(src, dest, direction);
+			// loop through map definition
+			_.each(arguments[0], function (destKey, src) {
+				// invoke map single method.
+				mapSingle.call(this, src, destKey, options);
 
 			}, this);
-
 		}
 
 		return this;
@@ -415,7 +409,7 @@ define('pipe',['require','exports','module','subject','lodash','./__pipe/pump','
 
 			if (src) { this.from(src); }
 			if (dest) { this.to(dest); }
-			if (map) { this.map(map, options.direction); }
+			if (map) { this.map(map, options); }
 		},
 
 		get: function pipeGet(object, property) {

@@ -34,11 +34,12 @@
 
 
 			// pipe
-			var p = pipe(src, dest, {
-				keyA: { dest: 'destKeyA', direction: 'from' },
-				keyB: { dest: 'destKeyB', direction: 'both' },
-				keyC: { dest: 'destKeyC', direction: 'to' },
-			});
+			var p = pipe(src, dest);
+
+			p
+			.map('keyA', 'destKeyA', 'from')
+			.map('keyB', 'destKeyB', { direction: 'both' })
+			.map({ keyC: 'destKeyC'}, { direction: 'to' });
 
 			// pump data
 			p.pump();
